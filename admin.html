@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Administrador - ARIBRA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --navy:#17384A;
+      --navy-2:#123040;
+      --bg:#ffffff;
+      --cyan-1:#79E6EC; /* claro */
+      --cyan-2:#58C6D8; /* medio */
+      --cyan-3:#1F86A5; /* escuro */
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:var(--bg);
+      font-family:'Montserrat', system-ui, -apple-system, Segoe UI, Roboto, Arial, "Helvetica Neue", sans-serif;
+      color:#0b1a23;
+      overflow:hidden;
+    }
+
+    .wrap{ position:relative; height:100vh; width:100vw; display:flex; }
+
+    /* Sidebar colapsável + hambúrguer */
+    .sidebar{ position:fixed; left:0; top:0; bottom:0; width:220px; background:#fff; border-right:3px solid var(--navy); padding:28px 14px; display:flex; flex-direction:column; align-items:center; gap:18px; z-index:1001; transform:translateX(-100%); transition:transform .25s ease; }
+    body.nav-open .sidebar{ transform:translateX(0); }
+    .hamburger{ position:fixed; left:14px; top:14px; z-index:1002; width:40px; height:40px; border-radius:10px; border:2px solid var(--navy); background:#fff; display:none; align-items:center; justify-content:center; cursor:pointer; }
+    .hamburger span{ width:20px; height:2px; background:var(--navy); position:relative; display:block; }
+    .hamburger span::before, .hamburger span::after{ content:''; position:absolute; left:0; right:0; height:2px; background:var(--navy); }
+    .hamburger span::before{ top:-6px; }
+    .hamburger span::after{ top:6px; }
+    .overlay{ position:fixed; inset:0; background:transparent; z-index:1000; display:none; }
+    body.nav-open .overlay{ display:block; }
+
+    /* Sidebar (já definida acima com width:220px) */
+    .brand{ display:flex; flex-direction:column; align-items:center; gap:8px; margin-bottom:8px; text-align:center; }
+    .brand img{ width:66px; height:auto; }
+    .brand .name{ font-weight:800; letter-spacing:0.5px; color:var(--navy); font-size:18px; }
+    .brand .sub{ font-size:11px; color:#6c7b86; letter-spacing:0.6px; margin-top:-6px; }
+    .menu{ width:100%; display:flex; flex-direction:column; gap:16px; margin-top:8px; }
+    .pill{ 
+      display:flex; 
+      align-items:center; 
+      justify-content:center; 
+      color:#fff; 
+      font-weight:700; 
+      font-size:13px; 
+      letter-spacing:.3px; 
+      height:28px; 
+      border-radius:999px; 
+      background:var(--navy); 
+      box-shadow:0 2px 6px rgba(0,0,0,0.08); 
+      width:100%; 
+      border:none; 
+      cursor:pointer; 
+      text-decoration:none;
+      transition: background-color 0.2s;
+    }
+    .pill:where(:hover, :focus-visible){ 
+      background:#1a7189; 
+      outline: none;
+    }
+    .pill:focus-visible{ 
+      box-shadow: 0 0 0 3px #58C6D8;
+    }
+    .pill[aria-current="page"]{ 
+      background:#1F86A5; 
+      border:2px solid #fff; 
+      box-shadow:0 0 0 2px #1F86A5; 
+    }
+
+    /* Conteúdo + dashboard */
+    .content{ position:relative; flex:1; height:100%; background:#fff; padding:28px; overflow:auto; margin-left:0; }
+    .watermark{ position:absolute; right:-120px; top:-40px; width:1200px; opacity:0.06; pointer-events:none; user-select:none; }
+
+    /* Título */
+    .page-title{ margin:0 0 18px 0; font-size:22px; font-weight:800; color:var(--navy); letter-spacing:.3px; }
+
+    /* KPIs */
+    .kpis{ display:grid; grid-template-columns: repeat(4, minmax(140px, 1fr)); gap:16px; margin-bottom:22px; }
+    .kpi{ 
+      background:var(--bg); 
+      border-radius:12px; 
+      padding:18px 16px; 
+      text-align:center; 
+      box-shadow:0 2px 12px rgba(0,0,0,0.05);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      border: 1px solid #e5e7eb;
+    }
+    .kpi:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .kpi-label{ 
+      color:#6b7280; 
+      font-size:13px; 
+      margin-bottom:6px;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+    .kpi-value{ 
+      font-size:26px; 
+      font-weight:700; 
+      color:var(--navy);
+      margin-bottom: 4px;
+    }
+    .kpi-trend {
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .kpi-trend.up { color: #10b981; }
+    .kpi-trend.down { color: #ef4444; }
+
+    /* Grid principal */
+    .main-grid{ display:grid; grid-template-columns: 1.2fr .8fr; gap:22px; align-items:start; }
+    .panel{ 
+      background:var(--bg); 
+      border-radius:12px; 
+      box-shadow:0 2px 12px rgba(0,0,0,0.04);
+      border: 1px solid #e5e7eb;
+      overflow:hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .panel:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid #f0f4f8;
+    }
+    .panel-title{ 
+      margin: 0;
+      font-size:15px; 
+      font-weight:600; 
+      color:var(--navy);
+    }
+    .panel-body{ 
+      padding: 0;
+    }
+    .btn-more {
+      background: none;
+      border: none;
+      color: #4b5563;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    .btn-more:hover {
+      background: #f3f4f6;
+      color: #1f2937;
+    }
+
+    /* Tabela */
+    .table{ width:100%; border-collapse:separate; border-spacing:0 10px; }
+    .table thead th{ text-align:left; font-size:12px; color:#334; opacity:.8; padding:0 10px; }
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .table{ 
+      width:100%; 
+      border-collapse:separate;
+      border-spacing: 0;
+      min-width: 600px;
+    }
+    .table th{ 
+      text-align:left; 
+      padding: 12px 16px; 
+      font-size:12px; 
+      color:#6b7280; 
+      font-weight:600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: #f9fafb;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .table th:first-child {
+      border-top-left-radius: 8px;
+    }
+    .table th:last-child {
+      border-top-right-radius: 8px;
+    }
+    .table td{ 
+      padding: 16px;
+      border-bottom: 1px solid #f3f4f6; 
+      font-size:13.5px;
+      vertical-align: middle;
+    }
+    .table tbody tr:last-child td {
+      border-bottom: none;
+    }
+    .table tbody tr:hover {
+      background-color: #f9fafb;
+    }
+    .text-mono {
+      font-family: 'Roboto Mono', monospace;
+      color: #4b5563;
+    }
+    .user-avatar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .user-avatar > span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: #e0f2fe;
+      color: #0369a1;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .activity-time {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 2px;
+    }
+
+    /* Atividade */
+    .activity{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
+    .activity li{ 
+      display:flex; 
+      gap:12px; 
+      align-items:flex-start; 
+      font-size:13px; 
+      background:#f8fafc; 
+      border-left:3px solid #1F86A5;
+      border-radius:4px; 
+      padding:10px 12px;
+      transition: all 0.2s ease;
+    }
+    .activity li:hover {
+      background: #f1f5f9;
+      transform: translateX(2px);
+    }
+    .dot{ 
+      flex-shrink: 0;
+      width:8px; 
+      height:8px; 
+      border-radius:50%; 
+      background:#1F86A5; 
+      margin-top:6px; 
+    }
+
+    /* Usuarios (cadastro) */
+    .form-grid{ display:grid; grid-template-columns: repeat(2, minmax(200px,1fr)); gap:14px; padding:16px; }
+    .form-grid .input{ display:flex; flex-direction:column; gap:6px; }
+    .form-grid label{ font-size:12px; color:#6b7280; font-weight:600; }
+    .form-grid input, .form-grid select{ height:36px; padding:6px 10px; border:1px solid #e5e7eb; border-radius:8px; font-family:inherit; font-size:13px; }
+    .actions{ display:flex; gap:10px; padding:0 16px 16px 16px; }
+    .btn{ background:#1F86A5; color:#fff; border:none; border-radius:8px; padding:8px 14px; font-weight:700; cursor:pointer; }
+    .btn:hover{ background:#1a7189; }
+
+    /* Modal */
+    .modal{ position:fixed; inset:0; z-index:1100; display:flex; align-items:center; justify-content:center; padding:20px; }
+    .modal[hidden]{ display:none; }
+    .modal-backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.35); }
+    .modal-dialog{ position:relative; background:#fff; width:min(720px, 100%); border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,.2); overflow:hidden; transform:translateY(10px); opacity:0; transition:.2s ease; }
+    .modal.open .modal-dialog{ transform:translateY(0); opacity:1; }
+    .modal-header{ display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid #eef2f7; }
+    .modal-header h3{ margin:0; font-size:16px; color:var(--navy); }
+    .modal-close{ background:none; border:none; font-size:20px; line-height:1; cursor:pointer; color:#6b7280; }
+    .modal-body{ padding:0; }
+
+    /* Desktop: sidebar fixa sempre visível; sem hambúrguer nem overlay */
+    @media (min-width: 1025px){
+      .sidebar{ transform:none; }
+      .content{ margin-left:220px; }
+      .hamburger, .overlay{ display:none !important; }
+    }
+    /* Mobile & Tablet */
+    @media (max-width: 1024px){
+      .hamburger{ display:flex; }
+      .kpis{ grid-template-columns: repeat(2, 1fr); }
+      .main-grid{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <button class="hamburger" id="btnMenu" aria-label="Abrir menu"><span></span></button>
+  <div class="overlay" id="overlay" hidden></div>
+  <div class="wrap">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="IMG/ICON.png" alt="ARIBRA"/>
+        <div class="name">ARIBRA</div>
+        <div class="sub">ASISTENCIA S.L.</div>
+      </div>
+      <nav class="menu" aria-label="menu">
+        <button class="pill" type="button" data-section="dashboard" aria-current="page">Dashboard</button>
+        <button class="pill" type="button" data-section="usuarios">Usuarios</button>
+        <button class="pill" type="button" data-section="facturas">Facturas</button>
+        <button class="pill" type="button" data-section="facturasgasoil">Facturas Gasoil</button>
+        <button class="pill" type="button" data-section="baterias">Baterias</button>
+        <button class="pill" type="button" data-section="item6">Item 6</button>
+        <button class="pill" type="button" data-section="item7">Item 7</button>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <section id="view-dashboard" data-title="Dashboard (Admin)">
+        <h1 class="page-title">Dashboard (Admin)</h1>
+
+      <section class="kpis">
+        <div class="kpi">
+          <div class="kpi-label">Total</div>
+          <div class="kpi-value">1.248</div>
+          <div class="kpi-trend up">+12%</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Hoje</div>
+          <div class="kpi-value">36</div>
+          <div class="kpi-trend up">+5%</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Pendentes</div>
+          <div class="kpi-value">12</div>
+          <div class="kpi-trend down">-3%</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Concluídos</div>
+          <div class="kpi-value">24</div>
+          <div class="kpi-trend up">+8%</div>
+        </div>
+      </section>
+
+      <section class="main-grid">
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Recentes</h3>
+            <button class="btn-more" aria-label="Ver mais">Ver Tudo</button>
+          </div>
+          <div class="panel-body">
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Status</th>
+                    <th>Data</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="text-mono">#2024</td>
+                    <td>
+                      <div class="user-avatar">
+                        <span>ML</span>
+                        María López
+                      </div>
+                    </td>
+                    <td><span class="badge success">Concluído</span></td>
+                    <td>29/08/2025</td>
+                  </tr>
+                  <tr>
+                    <td class="text-mono">#2023</td>
+                    <td>
+                      <div class="user-avatar">
+                        <span>PS</span>
+                        Pedro Silva
+                      </div>
+                    </td>
+                    <td><span class="badge warning">Pendente</span></td>
+                    <td>29/08/2025</td>
+                  </tr>
+                  <tr>
+                    <td class="text-mono">#2022</td>
+                    <td>
+                      <div class="user-avatar">
+                        <span>LF</span>
+                        Luisa Fernández
+                      </div>
+                    </td>
+                    <td><span class="badge success">Concluído</span></td>
+                    <td>28/08/2025</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Atividade Recente</h3>
+          </div>
+          <div class="panel-body">
+            <ul class="activity">
+              <li>
+                <span class="dot"></span>
+                <div>
+                  <div>Usuário admin atualizou permissões</div>
+                  <div class="activity-time">Há 5 minutos</div>
+                </div>
+              </li>
+              <li>
+                <span class="dot"></span>
+                <div>
+                  <div>Novo usuário criado: operador-02</div>
+                  <div class="activity-time">Há 1 hora</div>
+                </div>
+              </li>
+              <li>
+                <span class="dot"></span>
+                <div>
+                  <div>Configuração salva com sucesso</div>
+                  <div class="activity-time">Hoje às 14:30</div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <img src="IMG/LOGO.png" class="watermark" alt="Marca d'agua" />
+      </section>
+
+      <section id="view-usuarios" data-title="Usuarios" hidden>
+        <h1 class="page-title">Usuarios</h1>
+
+        <div class="actions" style="justify-content:flex-end; padding:0 0 12px 0;">
+          <button class="btn" id="btnOpenUserModal" type="button">Cadastrar Usuário</button>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Usuários Cadastrados</h3>
+          </div>
+          <div class="panel-body">
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Perfil</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="usersTbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Cadastro Usuário -->
+        <div id="userModal" class="modal" hidden>
+          <div class="modal-backdrop" aria-hidden="true"></div>
+          <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="userModalTitle">
+            <div class="modal-header">
+              <h3 id="userModalTitle">Cadastrar Usuário</h3>
+              <button class="modal-close" id="btnCloseUserModal" type="button" aria-label="Fechar">×</button>
+            </div>
+            <div class="modal-body">
+              <form id="userForm">
+                <div class="form-grid">
+                  <div class="input">
+                    <label for="nome">Nome</label>
+                    <input id="nome" name="nome" required />
+                  </div>
+                  <div class="input">
+                    <label for="email">Email</label>
+                    <input id="email" name="email" type="email" required />
+                  </div>
+                  <div class="input">
+                    <label for="perfil">Perfil</label>
+                    <select id="perfil" name="perfil">
+                      <option value="operador">Operador</option>
+                    </select>
+                  </div>
+                  <div class="input">
+                    <label for="senha">Senha</label>
+                    <input id="senha" name="senha" type="password" required />
+                  </div>
+                </div>
+                <div class="actions" style="justify-content:flex-end;">
+                  <button class="btn" type="button" id="btnCancelUserModal" style="background:#6b7280">Cancelar</button>
+                  <button class="btn" type="submit">Salvar</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    (function(){
+      // Guarda de sessão simples: exige login válido
+      try{
+        if (sessionStorage.getItem('aribra_auth') !== '1') {
+          window.location.href = 'index.html';
+          return;
+        }
+      }catch(_){ /* sessionStorage indisponível */ }
+      const body = document.body;
+      const btn = document.getElementById('btnMenu');
+      const overlay = document.getElementById('overlay');
+      function close(){ body.classList.remove('nav-open'); overlay.hidden=true; }
+      function open(){ body.classList.add('nav-open'); overlay.hidden=false; }
+      btn.addEventListener('click', ()=>{ body.classList.contains('nav-open') ? close() : open(); });
+      overlay.addEventListener('click', close);
+      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') close(); });
+
+      // Toggle seções (SPA simples)
+      const sections = {
+        dashboard: document.getElementById('view-dashboard'),
+        usuarios: document.getElementById('view-usuarios')
+      };
+      const pills = document.querySelectorAll('.menu .pill');
+      // Modal elementos e funções
+      const userModal = document.getElementById('userModal');
+      const btnOpenUserModal = document.getElementById('btnOpenUserModal');
+      const btnCloseUserModal = document.getElementById('btnCloseUserModal');
+      const btnCancelUserModal = document.getElementById('btnCancelUserModal');
+      const modalBackdrop = userModal ? userModal.querySelector('.modal-backdrop') : null;
+
+      function openUserModal(){
+        if(!userModal) return;
+        userModal.hidden = false;
+        // animação
+        requestAnimationFrame(()=> userModal.classList.add('open'));
+      }
+      function closeUserModal(){
+        if(!userModal) return;
+        userModal.classList.remove('open');
+        setTimeout(()=>{ userModal.hidden = true; }, 150);
+      }
+      if(btnOpenUserModal) btnOpenUserModal.addEventListener('click', ()=>{ setCreateMode(); openUserModal(); });
+      if(btnCloseUserModal) btnCloseUserModal.addEventListener('click', closeUserModal);
+      if(btnCancelUserModal) btnCancelUserModal.addEventListener('click', closeUserModal);
+      if(modalBackdrop) modalBackdrop.addEventListener('click', closeUserModal);
+      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeUserModal(); });
+      function setActive(section){
+        // ao sair de Usuarios, fecha modal
+        if(section !== 'usuarios'){ closeUserModal(); setCreateMode(); }
+        Object.entries(sections).forEach(([key, el])=>{
+          if(!el) return;
+          el.hidden = key !== section;
+        });
+        pills.forEach(b=>{
+          if(b.dataset.section){
+            if(b.dataset.section===section){ b.setAttribute('aria-current','page'); }
+            else{ b.removeAttribute('aria-current'); }
+          }
+        });
+        const active = sections[section];
+        if(active){
+          const h1 = active.querySelector('.page-title');
+          if(h1){ document.title = h1.textContent + ' - ARIBRA'; }
+        }
+      }
+      document.querySelector('.menu').addEventListener('click', (e)=>{
+        const btn = e.target.closest('.pill');
+        if(!btn || !btn.dataset.section) return;
+        const sec = btn.dataset.section;
+        if(sections[sec]){
+          setActive(sec);
+        }
+      });
+
+      // Usuarios: armazenamento simples em localStorage
+      const LS_KEY = 'aribra_users';
+      const readUsers = ()=>{
+        try{ return JSON.parse(localStorage.getItem(LS_KEY)||'[]'); }catch{ return []; }
+      };
+      const writeUsers = (arr)=> localStorage.setItem(LS_KEY, JSON.stringify(arr));
+      const tbody = document.getElementById('usersTbody');
+      function renderUsers(){
+        const arr = readUsers();
+        tbody.innerHTML = arr.map((u, i)=>`
+          <tr>
+            <td>${u.nome}</td>
+            <td>${u.email}</td>
+            <td><span class="badge ${u.perfil==='admin'?'success':'pending'}">${u.perfil}</span></td>
+            <td style="display:flex; gap:8px;">
+              <button class="btn" data-act="edit" data-idx="${i}" style="background:#0ea5e9">Editar</button>
+              <button class="btn" data-act="del" data-idx="${i}" style="background:#ef4444">Remover</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+      const form = document.getElementById('userForm');
+      let editIndex = null; // null = criando, número = editando
+      const formSubmitBtn = form ? form.querySelector('button[type="submit"]') : null;
+
+      function setCreateMode(){
+        editIndex = null;
+        if(form){ form.reset(); }
+        const title = document.getElementById('userModalTitle');
+        if(title) title.textContent = 'Cadastrar Usuário';
+        if(formSubmitBtn) formSubmitBtn.textContent = 'Salvar';
+      }
+
+      function setEditMode(idx){
+        const arr = readUsers();
+        const u = arr[idx];
+        if(!u) return;
+        editIndex = idx;
+        const title = document.getElementById('userModalTitle');
+        if(title) title.textContent = 'Editar Usuário';
+        if(formSubmitBtn) formSubmitBtn.textContent = 'Atualizar';
+        // preencher campos
+        const nome = document.getElementById('nome');
+        const email = document.getElementById('email');
+        const perfil = document.getElementById('perfil');
+        const senha = document.getElementById('senha');
+        if(nome) nome.value = u.nome || '';
+        if(email) email.value = u.email || '';
+        if(perfil) perfil.value = 'operador';
+        if(senha) senha.value = '';
+      }
+      if(form){
+        form.addEventListener('submit', (ev)=>{
+          ev.preventDefault();
+          const data = Object.fromEntries(new FormData(form).entries());
+          const arr = readUsers();
+          if(editIndex===null){
+            arr.push({ nome:data.nome, email:data.email, perfil:'operador' });
+          } else {
+            arr[editIndex] = { nome:data.nome, email:data.email, perfil:'operador' };
+          }
+          writeUsers(arr);
+          form.reset();
+          renderUsers();
+          closeUserModal();
+          alert(editIndex===null ? 'Usuário salvo.' : 'Usuário atualizado.');
+          setCreateMode();
+        });
+      }
+      if(tbody){
+        tbody.addEventListener('click', (e)=>{
+          const btnDel = e.target.closest('button[data-act="del"]');
+          const btnEdit = e.target.closest('button[data-act="edit"]');
+          if(btnDel){
+            const idx = +btnDel.dataset.idx;
+            const arr = readUsers();
+            arr.splice(idx,1);
+            writeUsers(arr);
+            renderUsers();
+            return;
+          }
+          if(btnEdit){
+            const idx = +btnEdit.dataset.idx;
+            setEditMode(idx);
+            openUserModal();
+            return;
+          }
+        });
+      }
+      renderUsers();
+
+    })();
+  </script>
+</body>
+</html>

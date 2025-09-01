@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel - ARIBRA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --navy:#17384A;
+      --navy-2:#123040;
+      --bg:#ffffff;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:var(--bg);
+      font-family:'Montserrat', system-ui, -apple-system, Segoe UI, Roboto, Arial, "Helvetica Neue", sans-serif;
+      color:#0b1a23;
+      overflow:hidden;
+    }
+
+    /* Layout principal */
+    .wrap{ position:relative; height:100vh; width:100vw; display:flex; }
+
+    /* Sidebar colapsável + hambúrguer */
+    .sidebar{ position:fixed; left:0; top:0; bottom:0; width:220px; background:#fff; border-right:3px solid var(--navy); padding:28px 14px; display:flex; flex-direction:column; align-items:center; gap:18px; z-index:1001; transform:translateX(-100%); transition:transform .25s ease; }
+    body.nav-open .sidebar{ transform:translateX(0); }
+    .hamburger{ position:fixed; left:14px; top:14px; z-index:1002; width:40px; height:40px; border-radius:10px; border:2px solid var(--navy); background:#fff; display:none; align-items:center; justify-content:center; cursor:pointer; }
+    .hamburger span{ width:20px; height:2px; background:var(--navy); position:relative; display:block; }
+    .hamburger span::before, .hamburger span::after{ content:''; position:absolute; left:0; right:0; height:2px; background:var(--navy); }
+    .hamburger span::before{ top:-6px; }
+    .hamburger span::after{ top:6px; }
+    .overlay{ position:fixed; inset:0; background:transparent; z-index:1000; display:none; }
+    body.nav-open .overlay{ display:block; }
+    .brand{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:8px;
+      margin-bottom:8px;
+      text-align:center;
+    }
+    .brand img{ width:66px; height:auto; }
+    .brand .name{ font-weight:800; letter-spacing:0.5px; color:var(--navy); font-size:18px; }
+    .brand .sub{ font-size:11px; color:#6c7b86; letter-spacing:0.6px; margin-top:-6px; }
+
+    /* Botões ovais escuros (apenas decorativos para igualar a imagem) */
+    .menu{ width:100%; display:flex; flex-direction:column; gap:16px; margin-top:8px; }
+    .pill{
+      height:26px;
+      border-radius:999px;
+      background:var(--navy);
+      box-shadow:0 2px 6px rgba(0,0,0,0.08);
+      display:block;
+      width:100%;
+      border:none;
+      cursor:pointer;
+      text-decoration:none;
+      color:inherit;
+    }
+    .pill:focus-visible{ outline:3px solid #58C6D8; outline-offset:2px; }
+    .pill-dashboard{ display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:13px; letter-spacing:.3px; height:28px; background:#1F86A5; }
+    .pill-dashboard:where(:hover, :focus-visible){ background:#1a7189; }
+    .pill-dashboard[aria-current="page"]{ background:#1F86A5; border:2px solid #fff; box-shadow:0 0 0 2px #1F86A5; }
+    /* Repetimos 6 pílulas como no mock */
+
+    /* Conteúdo + dashboard */
+    .content{ position:relative; flex:1; height:100%; background:#fff; margin-left:0; padding:28px; overflow:auto; }
+    .watermark{
+      position:absolute;
+      right:-120px; /* empurrada para fora como na imagem */
+      top:-40px;
+      width:1200px;
+      opacity:0.06; /* bem clarinha */
+      pointer-events:none;
+      user-select:none;
+    }
+
+    /* Título */
+    .page-title{ margin:0 0 18px 0; font-size:22px; font-weight:800; color:var(--navy); letter-spacing:.3px; }
+
+    /* KPIs */
+    .kpis{ display:grid; grid-template-columns: repeat(4, minmax(140px, 1fr)); gap:16px; margin-bottom:22px; }
+    .kpi{ background:#0f2a38; color:#fff; border-radius:16px; padding:16px; box-shadow:0 6px 18px rgba(0,0,0,.08); }
+    .kpi .kpi-label{ font-size:12px; opacity:.9; letter-spacing:.3px; }
+    .kpi .kpi-value{ margin-top:6px; font-size:22px; font-weight:800; letter-spacing:.3px; }
+
+    /* Grid principal */
+    .main-grid{ display:grid; grid-template-columns: 1.2fr .8fr; gap:22px; align-items:start; }
+    .panel{ background:#fff; border:2px solid var(--navy); border-radius:16px; box-shadow:0 6px 18px rgba(0,0,0,.06); overflow:hidden; }
+    .panel .panel-title{ padding:12px 16px; font-weight:800; color:#fff; background:var(--navy); letter-spacing:.3px; }
+    .panel .panel-body{ padding:12px 16px; }
+
+    /* Tabela */
+    .table{ width:100%; border-collapse:separate; border-spacing:0 10px; }
+    .table thead th{ text-align:left; font-size:12px; color:#334; opacity:.8; padding:0 10px; }
+    .table tbody tr{ background:#f7f9fb; }
+    .table tbody td{ padding:10px; font-size:13px; border-top:1px solid #e6eef3; border-bottom:1px solid #e6eef3; }
+    .table tbody tr td:first-child{ border-left:1px solid #e6eef3; border-top-left-radius:10px; border-bottom-left-radius:10px; }
+    .table tbody tr td:last-child{ border-right:1px solid #e6eef3; border-top-right-radius:10px; border-bottom-right-radius:10px; }
+    .badge{ display:inline-block; padding:4px 10px; border-radius:999px; font-size:12px; color:#fff; }
+    .badge.ok{ background:#1F86A5; }
+    .badge.pend{ background:#58C6D8; color:#06323f; }
+
+    /* Atividade */
+    .activity{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
+    .activity li{ display:flex; gap:10px; align-items:flex-start; font-size:13px; background:#f7f9fb; border:1px solid #e6eef3; border-radius:10px; padding:10px; }
+    .dot{ width:8px; height:8px; border-radius:50%; background:#1F86A5; margin-top:6px; }
+
+    /* Desktop: sidebar fixa sempre visível; sem hambúrguer nem overlay */
+    @media (min-width: 1025px){
+      .sidebar{ transform:none; }
+      .content{ margin-left:220px; }
+      .hamburger, .overlay{ display:none !important; }
+    }
+    /* Mobile & Tablet: menu hambúrguer */
+    @media (max-width: 1024px){
+      .hamburger{ display:flex; }
+      .watermark{ width:760px; right:-60px; top:-10px; }
+      .sidebar{ width:220px; }
+      .kpis{ grid-template-columns: repeat(2, 1fr); }
+      .main-grid{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <button class="hamburger" id="btnMenu" aria-label="Abrir menu"><span></span></button>
+  <div class="overlay" id="overlay" hidden></div>
+  <div class="wrap">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="IMG/ICON.png" alt="ARIBRA"/>
+        <div class="name">ARIBRA</div>
+        <div class="sub">ASISTENCIA S.L.</div>
+      </div>
+      <nav class="menu" aria-label="menu">
+        <button class="pill pill-dashboard" type="button" aria-current="page">Dashboard</button>
+        <button class="pill" type="button" aria-label="Item 2"></button>
+        <button class="pill" type="button" aria-label="Item 3"></button>
+        <button class="pill" type="button" aria-label="Item 4"></button>
+        <button class="pill" type="button" aria-label="Item 5"></button>
+        <button class="pill" type="button" aria-label="Item 6"></button>
+        <button class="pill" type="button" aria-label="Item 7"></button>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <h1 class="page-title">Dashboard</h1>
+
+      <section class="kpis">
+        <div class="kpi"><div class="kpi-label">Total</div><div class="kpi-value">1.248</div></div>
+        <div class="kpi"><div class="kpi-label">Hoje</div><div class="kpi-value">36</div></div>
+        <div class="kpi"><div class="kpi-label">Pendentes</div><div class="kpi-value">12</div></div>
+        <div class="kpi"><div class="kpi-label">Concluídos</div><div class="kpi-value">24</div></div>
+      </section>
+
+      <section class="main-grid">
+        <div class="panel">
+          <div class="panel-title">Recentes</div>
+          <div class="panel-body">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Cliente</th>
+                  <th>Status</th>
+                  <th>Data</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>#1024</td>
+                  <td>Juan Pérez</td>
+                  <td><span class="badge ok">Concluído</span></td>
+                  <td>29/08/2025</td>
+                </tr>
+                <tr>
+                  <td>#1023</td>
+                  <td>Ana Gómez</td>
+                  <td><span class="badge pend">Pendente</span></td>
+                  <td>29/08/2025</td>
+                </tr>
+                <tr>
+                  <td>#1022</td>
+                  <td>Carlos Ruiz</td>
+                  <td><span class="badge ok">Concluído</span></td>
+                  <td>28/08/2025</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Atividade</div>
+          <div class="panel-body">
+            <ul class="activity">
+              <li><span class="dot"></span> Novo chamado #1024 criado por Juan Pérez</li>
+              <li><span class="dot"></span> Pedido #1023 marcado como pendente</li>
+              <li><span class="dot"></span> Pedido #1022 concluído por agente</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <img src="IMG/ICON.png" class="watermark" alt="Marca d'agua" />
+    </main>
+  </div>
+  <script>
+    (function(){
+      const body = document.body;
+      const btn = document.getElementById('btnMenu');
+      const overlay = document.getElementById('overlay');
+      function close(){ body.classList.remove('nav-open'); overlay.hidden=true; }
+      function open(){ body.classList.add('nav-open'); overlay.hidden=false; }
+      btn.addEventListener('click', ()=>{ body.classList.contains('nav-open') ? close() : open(); });
+      overlay.addEventListener('click', close);
+      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') close(); });
+    })();
+  </script>
+</body>
+</html>

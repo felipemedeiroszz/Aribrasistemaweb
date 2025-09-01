@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #17384A; /* card background */
+      --navy-deep: #0f2a39;
+      --text: #ffffff;
+      --field-bg: #ffffff;
+      --placeholder: rgba(0,0,0,0.45);
+      --btn-bg: #ffffff;
+      --btn-text: #17384A;
+      --shadow: 0 10px 30px rgba(0,0,0,0.12);
+      --radius-card: 26px;
+      --radius-pill: 28px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: 'Montserrat', system-ui, -apple-system, Segoe UI, Roboto, Arial, "Helvetica Neue", sans-serif;
+      background-color: #ffffff;
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    /* Background watermark */
+    .bg-watermark {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .bg-watermark img {
+      position: absolute;
+      right: -260px; /* empurra mais para a direita para caber o aumento */
+      top: -20px;
+      width: 1400px; /* bem maior para ficar como a imagem de referência */
+      max-width: none;
+      opacity: 0.06; /* bem clarinho */
+    }
+
+    /* Top small logo */
+    .top-logo {
+      position: relative;
+      width: 94px;
+      height: auto;
+      display: block;
+      margin: 40px auto 10px auto;
+      z-index: 2;
+    }
+
+    /* Login card */
+    .card {
+      width: 520px;
+      max-width: calc(100% - 48px);
+      margin: 0 auto;
+      background: var(--navy);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow);
+      padding: 26px 34px 32px 34px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 14px 0 8px 0;
+    }
+    .label {
+      font-size: 14px;
+      font-weight: 700;
+      color: #eaf3f8;
+      letter-spacing: 0.2px;
+    }
+    .input {
+      width: 100%;
+      height: 44px;
+      background: var(--field-bg);
+      border: none;
+      border-radius: var(--radius-pill);
+      padding: 0 18px;
+      font-size: 15px;
+      color: #1b1b1b;
+      outline: none;
+      box-shadow: inset 0 0 0 2px rgba(0,0,0,0.02);
+    }
+    .input::placeholder { color: var(--placeholder); }
+
+    .actions {
+      text-align: center;
+      margin-top: 14px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 40px;
+      padding: 0 26px;
+      border-radius: var(--radius-pill);
+      background: var(--btn-bg);
+      color: var(--btn-text);
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
+      letter-spacing: 0.6px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.10);
+    }
+    .btn:active { transform: translateY(1px); }
+
+    /* Subtle rounded corners of card exactness */
+    .card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius-card);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+      pointer-events: none;
+    }
+
+    /* Layout helper to position roughly like the screenshot */
+    .layout {
+      display: grid;
+      grid-template-rows: auto auto;
+      min-height: 100vh;
+      place-content: center; /* centraliza vertical e horizontal */
+      justify-items: center;
+      gap: 10px;
+      padding: 0;
+    }
+
+    /* Modal admin */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      width: 92%;
+      max-width: 420px;
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+      padding: 22px;
+      color: #0b1b22;
+    }
+    .modal h3 { margin: 0 0 14px 0; font-weight: 800; color: #17384A; font-size: 18px; }
+    .modal .field { margin: 10px 0 6px 0; }
+    .modal .input { height: 42px; }
+    .modal .actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px; }
+    .btn.secondary { background: #e9eef2; color: #17384A; box-shadow: none; }
+
+    @media (max-width: 680px) {
+      .bg-watermark img { right: -120px; width: 520px; }
+      .card { padding: 22px 22px 26px 22px; }
+      .btn { width: 100%; }
+    }
+    /* Message Modal */
+    .message-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; }
+    .message-modal.open { display: flex; }
+    .message-modal-content { background: white; border-radius: 12px; width: 90%; max-width: 400px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: modalFadeIn 0.2s ease; }
+    .message-modal-header { padding: 16px 20px; background: #17384A; color: white; font-weight: 700; font-size: 16px; display: flex; justify-content: space-between; align-items: center; }
+    .message-modal-body { padding: 24px 20px; color: #333; font-size: 15px; line-height: 1.5; }
+    .message-modal-footer { padding: 12px 20px; background: #f8f9fa; display: flex; justify-content: flex-end; gap: 10px; }
+    .message-modal-btn { padding: 8px 16px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    .message-modal-btn.primary { background: #1F86A5; color: white; }
+    .message-modal-btn.primary:hover { background: #1a7189; }
+    .message-modal-btn.secondary { background: #e9ecef; color: #495057; }
+    .message-modal-btn.secondary:hover { background: #dee2e6; }
+    @keyframes modalFadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+  <div class="bg-watermark" aria-hidden="true">
+    <img src="IMG/LOGO.png" alt="" />
+  </div>
+
+  <div class="layout">
+    <img class="top-logo" src="IMG/ICON.png" alt="Logo" />
+
+    <div class="card">
+      <form id="loginForm">
+        <div class="field">
+          <label class="label" for="email">Correo electrónico</label>
+          <input id="email" class="input" type="email" placeholder="" required />
+        </div>
+        <div class="field">
+          <label class="label" for="password">Contraseña</label>
+          <input id="password" class="input" type="password" placeholder="" required />
+        </div>
+        <div class="actions">
+          <button class="btn" type="submit">ENTRAR</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de senha do administrador -->
+  <div class="modal-backdrop" id="adminModal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal" role="document">
+      <h3>Senha do administrador</h3>
+      <form id="adminForm">
+        <div class="field">
+          <label class="label" for="adminPass">Digite a senha</label>
+          <input id="adminPass" class="input" type="password" autocomplete="current-password" required />
+        </div>
+        <div class="actions">
+          <button type="button" class="btn secondary" id="btnCancel">Cancelar</button>
+          <button type="submit" class="btn">Confirmar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      // Gerenciador de mensagens modais
+      const messageModal = document.getElementById('messageModal');
+      const messageModalTitle = document.getElementById('messageModalTitle');
+      const messageModalBody = document.getElementById('messageModalBody');
+      const messageModalConfirm = document.getElementById('messageModalConfirm');
+      const messageModalCancel = document.getElementById('messageModalCancel');
+      const messageModalClose = messageModal.querySelector('.message-modal-close');
+      
+      function showMessage(title, message, options = {}) {
+        return new Promise((resolve) => {
+          messageModalTitle.textContent = title;
+          messageModalBody.textContent = message;
+          messageModalConfirm.textContent = options.confirmText || 'OK';
+          messageModalCancel.style.display = options.showCancel ? 'block' : 'none';
+          
+          const handleConfirm = () => {
+            hideMessage();
+            resolve(true);
+          };
+          
+          const handleCancel = () => {
+            hideMessage();
+            resolve(false);
+          };
+          
+          messageModalConfirm.onclick = handleConfirm;
+          messageModalCancel.onclick = handleCancel;
+          messageModalClose.onclick = handleCancel;
+          
+          messageModal.classList.add('open');
+          messageModal.setAttribute('aria-hidden', 'false');
+          
+          // Fechar ao clicar fora do conteúdo
+          const handleOutsideClick = (e) => {
+            if (e.target === messageModal) handleCancel();
+          };
+          
+          const handleEscape = (e) => {
+            if (e.key === 'Escape') handleCancel();
+          };
+          
+          messageModal.addEventListener('click', handleOutsideClick);
+          document.addEventListener('keydown', handleEscape);
+          
+          // Limpar event listeners após fechar
+          const cleanup = () => {
+            messageModal.removeEventListener('click', handleOutsideClick);
+            document.removeEventListener('keydown', handleEscape);
+            messageModalConfirm.onclick = null;
+            messageModalCancel.onclick = null;
+            messageModalClose.onclick = null;
+          };
+          
+          // Armazenar a função de limpeza
+          messageModal._cleanup = cleanup;
+        });
+      }
+      
+      function hideMessage() {
+        if (messageModal._cleanup) {
+          messageModal._cleanup();
+          delete messageModal._cleanup;
+        }
+        messageModal.classList.remove('open');
+        messageModal.setAttribute('aria-hidden', 'true');
+      }
+      
+      // Sobrescrever alert nativo
+      window.alert = (message) => {
+        return showMessage('Aviso', message);
+      };
+      
+      // Sobrescrever confirm nativo
+      window.confirm = (message) => {
+        return showMessage('Confirmação', message, { showCancel: true });
+      };
+
+      // Login simples: valida senha fixa e entra no admin
+      const loginForm = document.getElementById('loginForm');
+      if (loginForm) {
+        loginForm.addEventListener('submit', (e)=>{
+          e.preventDefault();
+          const pwd = document.getElementById('password').value.trim();
+          if (pwd === 'aribra2025') {
+            sessionStorage.setItem('aribra_auth','1');
+            window.location.href = 'admin.html';
+          } else {
+            showMessage('Aviso', 'Senha incorreta.');
+          }
+        });
+      }
+      const logo = document.querySelector('.top-logo');
+      const modal = document.getElementById('adminModal');
+      const form = document.getElementById('adminForm');
+      const passInput = document.getElementById('adminPass');
+      const btnCancel = document.getElementById('btnCancel');
+
+      let clickCount = 0;
+      let timerId = null;
+
+      function resetClicks(){
+        clickCount = 0;
+        if (timerId) { clearTimeout(timerId); timerId = null; }
+      }
+
+      function openModal(){
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden','false');
+        setTimeout(() => passInput.focus(), 0);
+      }
+      function closeModal(){
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden','true');
+        passInput.value = '';
+      }
+
+      // Detecta 3 cliques rápidos (em até 700ms)
+      if (logo) {
+        logo.addEventListener('click', () => {
+          clickCount++;
+          if (clickCount === 1) {
+            timerId = setTimeout(resetClicks, 700);
+          }
+          if (clickCount === 3) {
+            resetClicks();
+            openModal();
+          }
+        });
+      }
+
+      // Fechar ao clicar fora do conteúdo
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+      });
+      btnCancel.addEventListener('click', closeModal);
+      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeModal(); });
+
+      // Trata submissão da senha do modal admin
+      form.addEventListener('submit', (e)=>{
+        e.preventDefault();
+        const pwd = passInput.value.trim();
+        if (pwd === 'aribra2025') {
+          sessionStorage.setItem('aribra_auth','1');
+          window.location.href = 'admin.html';
+        } else {
+          showMessage('Aviso', 'Senha incorreta.').then(() => passInput.focus());
+        }
+      });
+    });
+  </script>
+  
+  <!-- Message Modal -->
+  <div id="messageModal" class="message-modal" aria-hidden="true">
+    <div class="message-modal-content">
+      <div class="message-modal-header">
+        <span id="messageModalTitle">Mensagem</span>
+        <button class="message-modal-close" aria-label="Fechar">&times;</button>
+      </div>
+      <div class="message-modal-body" id="messageModalBody"></div>
+      <div class="message-modal-footer">
+        <button type="button" id="messageModalCancel" class="message-modal-btn secondary" style="display: none;">Cancelar</button>
+        <button type="button" id="messageModalConfirm" class="message-modal-btn primary">OK</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
