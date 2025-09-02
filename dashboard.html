@@ -139,11 +139,11 @@
         <div class="sub">ASISTENCIA S.L.</div>
       </div>
       <nav class="menu" aria-label="menu">
-        <button class="pill pill-dashboard" type="button" aria-current="page">Dashboard</button>
-        <button class="pill" type="button" aria-label="Item 2"></button>
-        <button class="pill" type="button" aria-label="Item 3"></button>
-        <button class="pill" type="button" aria-label="Item 4"></button>
-        <button class="pill" type="button" aria-label="Item 5"></button>
+        <button class="pill pill-dashboard" type="button" data-section="dashboard" aria-current="page">Dashboard</button>
+        <button class="pill pill-dashboard" type="button" data-section="baterias">Preços das Baterias</button>
+        <button class="pill pill-dashboard" type="button" data-section="facturas">Ver Facturas</button>
+        <button class="pill pill-dashboard" type="button" data-section="facturasgasoil">Facturas Gasoil</button>
+        <button class="pill pill-dashboard" type="button" data-section="facturasherramientas">Facturas Herramientas</button>
         <button class="pill" type="button" aria-label="Item 6"></button>
         <button class="pill" type="button" aria-label="Item 7"></button>
         <button class="pill" id="btnLogout" type="button" style="background:#ef4444">Sair</button>
@@ -151,72 +151,210 @@
     </aside>
 
     <main class="content">
-      <h1 class="page-title">Dashboard</h1>
+      <section id="view-dashboard">
+        <h1 class="page-title">Dashboard</h1>
 
-      <div id="schedMessages" style="display:none; margin:0 0 16px 0;">
-        <div class="panel">
-          <div class="panel-title">Mensagens do Sistema</div>
-          <div class="panel-body" id="schedMessagesBody"></div>
+        <div id="schedMessages" style="display:none; margin:0 0 16px 0;">
+          <div class="panel">
+            <div class="panel-title">Mensagens do Sistema</div>
+            <div class="panel-body" id="schedMessagesBody"></div>
+          </div>
         </div>
-      </div>
 
-      <section class="kpis">
-        <div class="kpi"><div class="kpi-label">Total</div><div class="kpi-value">1.248</div></div>
-        <div class="kpi"><div class="kpi-label">Hoje</div><div class="kpi-value">36</div></div>
-        <div class="kpi"><div class="kpi-label">Pendentes</div><div class="kpi-value">12</div></div>
-        <div class="kpi"><div class="kpi-label">Concluídos</div><div class="kpi-value">24</div></div>
+        <section class="kpis">
+          <div class="kpi"><div class="kpi-label">Total</div><div class="kpi-value">1.248</div></div>
+          <div class="kpi"><div class="kpi-label">Hoje</div><div class="kpi-value">36</div></div>
+          <div class="kpi"><div class="kpi-label">Pendentes</div><div class="kpi-value">12</div></div>
+          <div class="kpi"><div class="kpi-label">Concluídos</div><div class="kpi-value">24</div></div>
+        </section>
+
+        <section class="main-grid">
+          <div class="panel">
+            <div class="panel-title">Recentes</div>
+            <div class="panel-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Status</th>
+                    <th>Data</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>#1024</td>
+                    <td>Juan Pérez</td>
+                    <td><span class="badge ok">Concluído</span></td>
+                    <td>29/08/2025</td>
+                  </tr>
+                  <tr>
+                    <td>#1023</td>
+                    <td>Ana Gómez</td>
+                    <td><span class="badge pend">Pendente</span></td>
+                    <td>29/08/2025</td>
+                  </tr>
+                  <tr>
+                    <td>#1022</td>
+                    <td>Carlos Ruiz</td>
+                    <td><span class="badge ok">Concluído</span></td>
+                    <td>28/08/2025</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-title">Atividade</div>
+            <div class="panel-body">
+              <ul class="activity">
+                <li><span class="dot"></span> Novo chamado #1024 criado por Juan Pérez</li>
+                <li><span class="dot"></span> Pedido #1023 marcado como pendente</li>
+                <li><span class="dot"></span> Pedido #1022 concluído por agente</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <img src="IMG/ICON.png" class="watermark" alt="Marca d'agua" />
       </section>
 
-      <section class="main-grid">
+      <section id="view-facturas" hidden>
+        <h1 class="page-title">Ver Facturas</h1>
         <div class="panel">
-          <div class="panel-title">Recentes</div>
+          <div class="panel-title">Filtros</div>
           <div class="panel-body">
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:end;">
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <label style="font-size:12px; color:#6b7280; font-weight:600;" for="facTipo">Tipo</label>
+                <select id="facTipo" style="height:36px; padding:6px 10px; border:1px solid #e5e7eb; border-radius:8px; font-family:inherit; font-size:13px; min-width:160px;">
+                  <option value="all">Todos</option>
+                  <option value="gasoil">Gasoil</option>
+                  <option value="herramientas">Herramientas</option>
+                </select>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <label style="font-size:12px; color:#6b7280; font-weight:600;" for="facDateFrom">Data de</label>
+                <input id="facDateFrom" type="date" style="height:36px; padding:6px 10px; border:1px solid #e5e7eb; border-radius:8px; font-family:inherit; font-size:13px;" />
+              </div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <label style="font-size:12px; color:#6b7280; font-weight:600;" for="facDateTo">até</label>
+                <input id="facDateTo" type="date" style="height:36px; padding:6px 10px; border:1px solid #e5e7eb; border-radius:8px; font-family:inherit; font-size:13px;" />
+              </div>
+              <div style="display:flex; gap:10px; margin-left:auto;">
+                <button type="button" id="facBtnClear" class="btn" style="background:#6b7280;">Limpar</button>
+                <button type="button" id="facBtnApply" class="btn" style="background:#1F86A5;">Aplicar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="panel" style="margin-top:12px;">
+          <div class="panel-title">Minhas Facturas</div>
+          <div class="panel-body">
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Tipo</th>
+                    <th>Nome</th>
+                    <th>Detalhe</th>
+                    <th>Data</th>
+                    <th>Imagem</th>
+                  </tr>
+                </thead>
+                <tbody id="facTbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-baterias" hidden>
+        <h1 class="page-title">Baterias</h1>
+        <div class="panel">
+          <div class="panel-title">Baterias</div>
+          <div class="panel-body">
+            <div style="display:flex; gap:8px; margin-bottom:12px;">
+              <button id="batTabSocio" type="button" class="btn" style="background:#1F86A5;">Sócio</button>
+              <button id="batTabCliente" type="button" class="btn" style="background:#6b7280;">Cliente</button>
+            </div>
             <table class="table">
               <thead>
                 <tr>
-                  <th>ID</th>
-                  <th>Cliente</th>
-                  <th>Status</th>
-                  <th>Data</th>
+                  <th>Modelo</th>
+                  <th>Amperes</th>
+                  <th>Tipo</th>
+                  <th id="batPriceHeader">Preço Sócio</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td>#1024</td>
-                  <td>Juan Pérez</td>
-                  <td><span class="badge ok">Concluído</span></td>
-                  <td>29/08/2025</td>
-                </tr>
-                <tr>
-                  <td>#1023</td>
-                  <td>Ana Gómez</td>
-                  <td><span class="badge pend">Pendente</span></td>
-                  <td>29/08/2025</td>
-                </tr>
-                <tr>
-                  <td>#1022</td>
-                  <td>Carlos Ruiz</td>
-                  <td><span class="badge ok">Concluído</span></td>
-                  <td>28/08/2025</td>
-                </tr>
-              </tbody>
+              <tbody id="batViewTbody"></tbody>
             </table>
           </div>
         </div>
-
+      </section>
+      
+      <section id="view-facturasherramientas" hidden>
+        <h1 class="page-title">Facturas Herramientas</h1>
         <div class="panel">
-          <div class="panel-title">Atividade</div>
+          <div class="panel-title">Cadastrar Factura de Herramienta</div>
           <div class="panel-body">
-            <ul class="activity">
-              <li><span class="dot"></span> Novo chamado #1024 criado por Juan Pérez</li>
-              <li><span class="dot"></span> Pedido #1023 marcado como pendente</li>
-              <li><span class="dot"></span> Pedido #1022 concluído por agente</li>
-            </ul>
+            <form id="herForm">
+              <div style="display:grid; grid-template-columns: repeat(2, minmax(200px,1fr)); gap:14px; margin-bottom:12px;">
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <label for="herNome" style="font-size:12px; color:#6b7280; font-weight:600;">Nome</label>
+                  <input id="herNome" name="nome" required style="height:36px; padding:6px 10px; border:1px solid #e5e7eb; border-radius:8px; font-family:inherit; font-size:13px;" />
+                </div>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <label for="herItem" style="font-size:12px; color:#6b7280; font-weight:600;">Item</label>
+                  <input id="herItem" name="item" required style="height:36px; padding:6px 10px; border:1px solid #e5e7eb; border-radius:8px; font-family:inherit; font-size:13px;" />
+                </div>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <label for="herImagem" style="font-size:12px; color:#6b7280; font-weight:600;">Imagem da factura</label>
+                  <input id="herImagem" name="imagem" type="file" accept="image/*" required style="height:36px; padding:6px 10px; border:1px solid #e5e7eb; border-radius:8px; font-family:inherit; font-size:13px;" />
+                </div>
+              </div>
+              <div style="display:flex; gap:10px; justify-content:flex-end;">
+                <button type="button" id="herBtnClear" class="btn" style="background:#6b7280; box-shadow:0 2px 10px rgba(0,0,0,0.06); border:1px solid #e5e7eb; color:#fff;">Limpar</button>
+                <button type="submit" class="btn" style="background:linear-gradient(135deg,#1F86A5,#0e7490); box-shadow:0 6px 14px rgba(31,134,165,0.25);">Salvar</button>
+              </div>
+            </form>
           </div>
         </div>
       </section>
-
-      <img src="IMG/ICON.png" class="watermark" alt="Marca d'agua" />
+      
+      <section id="view-facturasgasoil" hidden>
+        <h1 class="page-title">Facturas Gasoil</h1>
+        <div class="panel">
+          <div class="panel-title">Cadastrar Factura de Gasoil</div>
+          <div class="panel-body">
+            <form id="gasForm">
+              <div style="display:grid; grid-template-columns: repeat(2, minmax(200px,1fr)); gap:14px; margin-bottom:12px;">
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <label for="gasNome" style="font-size:12px; color:#6b7280; font-weight:600;">Nome</label>
+                  <input id="gasNome" name="nome" required style="height:36px; padding:6px 10px; border:1px solid #e5e7eb; border-radius:8px; font-family:inherit; font-size:13px;" />
+                </div>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <label for="gasMatricula" style="font-size:12px; color:#6b7280; font-weight:600;">Matrícula (Placa)</label>
+                  <input id="gasMatricula" name="matricula" required style="height:36px; padding:6px 10px; border:1px solid #e5e7eb; border-radius:8px; font-family:inherit; font-size:13px;" />
+                </div>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <label for="gasKm" style="font-size:12px; color:#6b7280; font-weight:600;">KM</label>
+                  <input id="gasKm" name="km" type="number" min="0" step="1" style="height:36px; padding:6px 10px; border:1px solid #e5e7eb; border-radius:8px; font-family:inherit; font-size:13px;" />
+                </div>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <label for="gasImagem" style="font-size:12px; color:#6b7280; font-weight:600;">Imagem da factura</label>
+                  <input id="gasImagem" name="imagem" type="file" accept="image/*" required style="height:36px; padding:6px 10px; border:1px solid #e5e7eb; border-radius:8px; font-family:inherit; font-size:13px;" />
+                </div>
+              </div>
+              <div style="display:flex; gap:10px; justify-content:flex-end;">
+                <button type="button" id="gasBtnClear" class="btn" style="background:#6b7280; box-shadow:0 2px 10px rgba(0,0,0,0.06); border:1px solid #e5e7eb; color:#fff;">Limpar</button>
+                <button type="submit" class="btn" style="background:linear-gradient(135deg,#1F86A5,#0e7490); box-shadow:0 6px 14px rgba(31,134,165,0.25);">Salvar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
     </main>
   </div>
   <script>
@@ -236,6 +374,41 @@
         btnLogout.addEventListener('click', ()=>{
           try{ sessionStorage.removeItem('aribra_auth'); }catch(_){}
           window.location.href = 'index.html';
+        });
+      }
+
+      // Toggle seções (Dashboard/Baterias)
+      const sections = {
+        dashboard: document.getElementById('view-dashboard'),
+        baterias: document.getElementById('view-baterias'),
+        facturas: document.getElementById('view-facturas'),
+        facturasgasoil: document.getElementById('view-facturasgasoil'),
+        facturasherramientas: document.getElementById('view-facturasherramientas'),
+      };
+      const menu = document.querySelector('.menu');
+      function setActive(section){
+        Object.entries(sections).forEach(([key, el])=>{ if(el) el.hidden = key !== section; });
+        // aria-current
+        menu.querySelectorAll('.pill').forEach(b=>{
+          if(b.dataset.section === section) b.setAttribute('aria-current','page');
+          else b.removeAttribute('aria-current');
+        });
+        // render imediato ao entrar em Ver Facturas
+        if(section === 'facturas' && typeof renderFacturas === 'function'){
+          try { renderFacturas(); } catch(_) {}
+        }
+        // atualizar título da aba
+        const active = sections[section];
+        if(active){ const h1 = active.querySelector('.page-title'); if(h1) document.title = h1.textContent + ' - ARIBRA'; }
+        // fechar menu em mobile ao selecionar
+        close();
+      }
+      if(menu){
+        menu.addEventListener('click', (e)=>{
+          const btn = e.target.closest('.pill');
+          if(!btn || !btn.dataset.section) return;
+          const sec = btn.dataset.section;
+          if(sections[sec]) setActive(sec);
         });
       }
 
@@ -272,9 +445,249 @@
           </div>`;
         }).join('');
       }
-
       renderScheduled();
       setInterval(renderScheduled, 30000);
+
+      // Pequeno toast central (para feedback)
+      function showToast(msg, duration=2000){
+        let el = document.getElementById('dash_toast');
+        if(!el){
+          el = document.createElement('div');
+          el.id = 'dash_toast';
+          el.setAttribute('role','status');
+          el.style.cssText = [
+            'position:fixed','left:50%','top:50%','transform:translate(-50%,-50%)',
+            'background:#17384A','color:#fff','padding:12px 16px','border-radius:12px',
+            'box-shadow:0 12px 28px rgba(0,0,0,.18)','z-index:2000','opacity:0','transition:opacity .18s ease',
+            'font-weight:700','letter-spacing:.2px','font-size:13px','text-align:center','max-width:90vw','white-space:pre-wrap'
+          ].join(';');
+          document.body.appendChild(el);
+        }
+        el.textContent = msg;
+        el.style.opacity = '1';
+        clearTimeout(el._t);
+        el._t = setTimeout(()=>{ el.style.opacity='0'; }, duration);
+      }
+
+      // Baterias (somente visualização) vindas do admin via localStorage
+      const BAT_KEY = 'aribra_baterias';
+      const batViewTbody = document.getElementById('batViewTbody');
+      const batPriceHeader = document.getElementById('batPriceHeader');
+      const batTabSocio = document.getElementById('batTabSocio');
+      const batTabCliente = document.getElementById('batTabCliente');
+      let batActiveTab = 'socio'; // 'socio' | 'cliente'
+      function fmtMoney(v){
+        const n = Number(v);
+        if(Number.isNaN(n)) return '-';
+        try{ return n.toLocaleString(undefined, { style:'currency', currency:'EUR' }); }catch{ return n.toFixed(2); }
+      }
+      function readBats(){
+        try{ return JSON.parse(localStorage.getItem(BAT_KEY)||'[]'); }catch{ return []; }
+      }
+      function updateBatTabsUI(){
+        if(!batTabSocio || !batTabCliente) return;
+        if(batActiveTab==='socio'){
+          batTabSocio.style.background = '#1F86A5';
+          batTabCliente.style.background = '#6b7280';
+        } else {
+          batTabSocio.style.background = '#6b7280';
+          batTabCliente.style.background = '#1F86A5';
+        }
+      }
+
+      function renderBats(){
+        if(!batViewTbody) return;
+        const arr = readBats();
+        if(batPriceHeader){ batPriceHeader.textContent = batActiveTab==='socio' ? 'Preço Sócio' : 'Preço Cliente'; }
+        batViewTbody.innerHTML = arr.map(b=>{
+          const price = batActiveTab==='socio' ? fmtMoney(b.precoSocio) : fmtMoney(b.precoCliente);
+          return `
+            <tr>
+              <td>${b.modelo||''}</td>
+              <td>${b.amperes||''}</td>
+              <td>${b.tipo||''}</td>
+              <td>${price}</td>
+            </tr>
+          `;
+        }).join('');
+        updateBatTabsUI();
+      }
+      renderBats();
+      window.addEventListener('storage', (e)=>{ if(e.key===BAT_KEY) renderBats(); });
+      // Atualiza periodicamente caso admin esteja aberto em outra aba
+      setInterval(renderBats, 15000);
+
+      if(batTabSocio){
+        batTabSocio.addEventListener('click', ()=>{
+          batActiveTab = 'socio';
+          renderBats();
+        });
+      }
+      if(batTabCliente){
+        batTabCliente.addEventListener('click', ()=>{
+          batActiveTab = 'cliente';
+          renderBats();
+        });
+      }
+
+      // =====================
+      // Facturas Gasoil (Cadastro pelo usuário)
+      // =====================
+      const GAS_KEY = 'aribra_facturas_gasoil';
+      const gasForm = document.getElementById('gasForm');
+      const gasBtnClear = document.getElementById('gasBtnClear');
+      const gasNome = document.getElementById('gasNome');
+      function gasRead(){ try{ return JSON.parse(localStorage.getItem(GAS_KEY)||'[]'); }catch{ return []; } }
+      function gasWrite(arr){ localStorage.setItem(GAS_KEY, JSON.stringify(arr)); }
+      async function fileToDataUrl(file){
+        return new Promise((resolve, reject)=>{
+          const fr = new FileReader();
+          fr.onload = ()=> resolve(fr.result);
+          fr.onerror = reject;
+          fr.readAsDataURL(file);
+        });
+      }
+      // Auto-preenche Nome a partir da sessão (email como identificação)
+      function fillUserName(){
+        try{
+          const n = sessionStorage.getItem('aribra_user_name') || '';
+          if(gasNome && n) gasNome.value = n;
+          const herNome = document.getElementById('herNome');
+          if(herNome && n) herNome.value = n;
+        }catch(_){/* ignore */}
+      }
+      fillUserName();
+
+      if(gasForm){
+        gasForm.addEventListener('submit', async (ev)=>{
+          ev.preventDefault();
+          const fd = new FormData(gasForm);
+          const nome = String(fd.get('nome')||'').trim();
+          const matricula = String(fd.get('matricula')||'').trim();
+          const km = Number(fd.get('km')||0);
+          const imgFile = fd.get('imagem');
+          if(!nome){ alert('Informe seu nome.'); return; }
+          if(!matricula){ alert('Informe a matrícula/placa.'); return; }
+          if(!(imgFile && imgFile.size>0)){ alert('Selecione a imagem da factura.'); return; }
+          let dataUrl;
+          try{ dataUrl = await fileToDataUrl(imgFile); }catch(_){ alert('Falha ao ler a imagem.'); return; }
+          const arr = gasRead();
+          arr.push({ nome, matricula, km: isNaN(km)? null : km, imagem: dataUrl, createdAt: new Date().toISOString() });
+          gasWrite(arr);
+          gasForm.reset();
+          fillUserName();
+          showToast('Factura de gasoil salva.', 2200);
+        });
+      }
+      if(gasBtnClear){ gasBtnClear.addEventListener('click', ()=> gasForm && gasForm.reset()); }
+
+      // =====================
+      // Facturas Herramientas (Cadastro pelo usuário)
+      // =====================
+      const HER_KEY = 'aribra_facturas_herramientas';
+      const herForm = document.getElementById('herForm');
+      const herBtnClear = document.getElementById('herBtnClear');
+      function herRead(){ try{ return JSON.parse(localStorage.getItem(HER_KEY)||'[]'); }catch{ return []; } }
+      function herWrite(arr){ localStorage.setItem(HER_KEY, JSON.stringify(arr)); }
+      if(herForm){
+        herForm.addEventListener('submit', async (ev)=>{
+          ev.preventDefault();
+          const fd = new FormData(herForm);
+          const nome = String(fd.get('nome')||'').trim();
+          const item = String(fd.get('item')||'').trim();
+          const imgFile = fd.get('imagem');
+          if(!nome){ alert('Informe seu nome.'); return; }
+          if(!item){ alert('Informe o item.'); return; }
+          if(!(imgFile && imgFile.size>0)){ alert('Selecione a imagem da factura.'); return; }
+          let dataUrl;
+          try{ dataUrl = await fileToDataUrl(imgFile); }catch(_){ alert('Falha ao ler a imagem.'); return; }
+          const arr = herRead();
+          arr.push({ nome, item, imagem: dataUrl, createdAt: new Date().toISOString() });
+          herWrite(arr);
+          herForm.reset();
+          fillUserName();
+          showToast('Factura de ferramenta salva.', 2200);
+        });
+      }
+      if(herBtnClear){ herBtnClear.addEventListener('click', ()=> herForm && herForm.reset()); }
+
+      // =====================
+      // Ver Facturas (Listagem com filtros por tipo/data do usuário logado)
+      // =====================
+      const facTbody = document.getElementById('facTbody');
+      const facTipo = document.getElementById('facTipo');
+      const facDateFrom = document.getElementById('facDateFrom');
+      const facDateTo = document.getElementById('facDateTo');
+      const facBtnClear = document.getElementById('facBtnClear');
+      const facBtnApply = document.getElementById('facBtnApply');
+
+      function getLoggedUserName(){
+        try{ return sessionStorage.getItem('aribra_user_name') || ''; }catch{ return ''; }
+      }
+      function parseISO(d){ const t = Date.parse(d); return Number.isNaN(t) ? null : t; }
+      function readAllFacturas(){
+        const gas = (function(){ try{ return JSON.parse(localStorage.getItem('aribra_facturas_gasoil')||'[]'); }catch{ return []; } })();
+        const her = (function(){ try{ return JSON.parse(localStorage.getItem('aribra_facturas_herramientas')||'[]'); }catch{ return []; } })();
+        const gasM = gas.map(x=>({ tipo:'gasoil', nome:x.nome, detalhe:x.matricula || '', km: x.km ?? null, imagem:x.imagem, createdAt:x.createdAt }));
+        const herM = her.map(x=>({ tipo:'herramientas', nome:x.nome, detalhe:x.item || '', imagem:x.imagem, createdAt:x.createdAt }));
+        return gasM.concat(herM);
+      }
+      function renderFacturas(){
+        if(!facTbody) return;
+        const user = getLoggedUserName();
+        const all = readAllFacturas().filter(f=> !user || (f.nome||'')===user);
+        // filtros
+        const t = facTipo ? facTipo.value : 'all';
+        let fromT = facDateFrom && facDateFrom.value ? Date.parse(facDateFrom.value) : null;
+        let toT = facDateTo && facDateTo.value ? Date.parse(facDateTo.value) : null;
+        if(Number.isNaN(fromT)) fromT = null;
+        if(Number.isNaN(toT)) toT = null;
+        const filtered = all.filter(f=>{
+          if(t!=='all' && f.tipo!==t) return false;
+          const ct = parseISO(f.createdAt);
+          if(ct===null) return false;
+          if(fromT!==null && ct < fromT) return false;
+          if(toT!==null){
+            // incluir o dia final por completo (adiciona 23:59:59)
+            const endOfDay = toT + (24*60*60*1000) - 1;
+            if(ct > endOfDay) return false;
+          }
+          return true;
+        });
+        facTbody.innerHTML = filtered.map(f=>{
+          const dateStr = (new Date(f.createdAt)).toLocaleString();
+          const img = f.imagem ? `<a href="${f.imagem}" target="_blank" rel="noopener">Abrir</a>` : '-';
+          const tipoLabel = f.tipo==='gasoil' ? 'Gasoil' : 'Herramientas';
+          return `
+            <tr>
+              <td>${tipoLabel}</td>
+              <td>${f.nome||''}</td>
+              <td>${f.detalhe||''}</td>
+              <td>${dateStr}</td>
+              <td>${img}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+      if(facBtnApply){ facBtnApply.addEventListener('click', renderFacturas); }
+      if(facBtnClear){ facBtnClear.addEventListener('click', ()=>{ if(facTipo) facTipo.value='all'; if(facDateFrom) facDateFrom.value=''; if(facDateTo) facDateTo.value=''; renderFacturas(); }); }
+      if(facTipo){ facTipo.addEventListener('change', renderFacturas); }
+      if(facDateFrom){ facDateFrom.addEventListener('change', renderFacturas); }
+      if(facDateTo){ facDateTo.addEventListener('change', renderFacturas); }
+      window.addEventListener('storage', (e)=>{ if(e.key==='aribra_facturas_gasoil' || e.key==='aribra_facturas_herramientas'){ renderFacturas(); } });
+
+      // Render inicial ao entrar na aba
+      const menuEl = document.querySelector('.menu');
+      if(menuEl){
+        menuEl.addEventListener('click', (e)=>{
+          const b = e.target.closest('.pill');
+          if(!b) return;
+          if(b.dataset.section==='facturas') setTimeout(renderFacturas, 0);
+        });
+      }
+
+      // Garante que começamos na seção Dashboard
+      setActive('dashboard');
     })();
   </script>
 </body>

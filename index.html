@@ -310,9 +310,11 @@
       if (loginForm) {
         loginForm.addEventListener('submit', (e)=>{
           e.preventDefault();
+          const email = document.getElementById('email').value.trim();
           const pwd = document.getElementById('password').value.trim();
           if (pwd === 'aribra2025') {
             sessionStorage.setItem('aribra_auth','1');
+            if(email){ sessionStorage.setItem('aribra_user_name', email); }
             window.location.href = 'admin.html';
           } else {
             showMessage('Aviso', 'Senha incorreta.');

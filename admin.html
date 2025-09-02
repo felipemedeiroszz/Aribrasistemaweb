@@ -304,13 +304,13 @@
         <div class="name">ARIBRA</div>
         <div class="sub">ASISTENCIA S.L.</div>
       </div>
+
       <nav class="menu" aria-label="menu">
         <button class="pill" type="button" data-section="dashboard" aria-current="page">Dashboard</button>
         <button class="pill" type="button" data-section="usuarios">Usuarios</button>
-        <button class="pill" type="button" data-section="facturas">Facturas</button>
         <button class="pill" type="button" data-section="facturasgasoil">Facturas Gasoil</button>
-        <button class="pill" type="button" data-section="baterias">Baterias</button>
-        <button class="pill" type="button" data-section="item6">Item 6</button>
+        <button class="pill" type="button" data-section="facturasherramientas">Facturas Herramientas</button>
+        <button class="pill" type="button" data-section="baterias">Preços das Baterias</button>
         <button class="pill" type="button" data-section="config">Configurações</button>
         <button class="pill" id="btnLogout" type="button" style="background:#ef4444">Sair</button>
       </nav>
@@ -343,7 +343,7 @@
         </div>
       </section>
 
-
+      
 
       <section class="main-grid">
         <div class="panel">
@@ -437,6 +437,132 @@
       <img src="IMG/LOGO.png" class="watermark" alt="Marca d'agua" />
       </section>
 
+      <section id="view-baterias" data-title="Baterias" hidden>
+        <h1 class="page-title">Baterias</h1>
+
+        <div class="panel" style="margin-bottom:16px;">
+          <div class="panel-header">
+            <h3 class="panel-title">Cadastrar / Editar Bateria</h3>
+          </div>
+          <div class="panel-body">
+            <form id="batForm">
+              <div class="form-grid" style="grid-template-columns: repeat(5, minmax(160px,1fr));">
+                <div class="input">
+                  <label for="batModelo">Modelo</label>
+                  <input id="batModelo" name="modelo" required />
+                </div>
+                <div class="input">
+                  <label for="batAmperes">Amperes</label>
+                  <input id="batAmperes" name="amperes" type="number" step="1" min="0" required />
+                </div>
+                <div class="input">
+                  <label for="batTipo">Tipo</label>
+                  <input id="batTipo" name="tipo" required />
+                </div>
+                <div class="input">
+                  <label for="batPrecoSocio">Preço Sócio</label>
+                  <input id="batPrecoSocio" name="precoSocio" type="number" step="0.01" min="0" required />
+                </div>
+                <div class="input">
+                  <label for="batPrecoCliente">Preço Cliente</label>
+                  <input id="batPrecoCliente" name="precoCliente" type="number" step="0.01" min="0" required />
+                </div>
+              </div>
+              <div class="actions" style="justify-content:flex-end; padding-top:8px;">
+                <button class="btn" type="button" id="batBtnCancelar" style="background:#6b7280">Limpar</button>
+                <button class="btn" type="submit" id="batBtnSubmit">Salvar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Baterias Cadastradas</h3>
+          </div>
+          <div class="panel-body">
+            <div class="actions" style="gap:8px; padding:12px 16px;">
+              <input id="batFilterModelo" placeholder="Filtrar por modelo" style="flex:1; max-width:280px; height:36px; padding:6px 10px; border:1px solid #e5e7eb; border-radius:8px; font-family:inherit; font-size:13px;" />
+            </div>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Modelo</th>
+                    <th>Amperes</th>
+                    <th>Tipo</th>
+                    <th>Preço Sócio</th>
+                    <th>Preço Cliente</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="batTbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Facturas Herramientas -->
+      <section id="view-facturasherramientas" data-title="Facturas Herramientas" hidden>
+        <h1 class="page-title">Facturas Herramientas</h1>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Todas as facturas de Herramientas</h3>
+          </div>
+          <div class="panel-body">
+            <div class="actions" style="gap:8px; padding:12px 16px; flex-wrap:wrap;">
+              <input id="herFilterName" placeholder="Filtrar por nome" style="flex:1; min-width:220px; height:36px; padding:6px 10px; border:1px solid #e5e7eb; border-radius:8px; font-family:inherit; font-size:13px;" />
+              <input id="herFilterDate" type="date" title="Filtrar por data de criação" style="height:36px; padding:6px 10px; border:1px solid #e5e7eb; border-radius:8px; font-family:inherit; font-size:13px;" />
+            </div>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Item</th>
+                    <th>Data</th>
+                    <th>Imagem</th>
+                  </tr>
+                </thead>
+                <tbody id="herTbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-facturasgasoil" data-title="Facturas Gasoil" hidden>
+        <h1 class="page-title">Facturas Gasoil</h1>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Todas as facturas de gasoil</h3>
+          </div>
+          <div class="panel-body">
+            <div class="actions" style="gap:8px; padding:12px 16px; flex-wrap:wrap;">
+              <input id="gasFilterName" placeholder="Filtrar por nome" style="flex:1; min-width:220px; height:36px; padding:6px 10px; border:1px solid #e5e7eb; border-radius:8px; font-family:inherit; font-size:13px;" />
+              <input id="gasFilterDate" type="date" title="Filtrar por data de criação" style="height:36px; padding:6px 10px; border:1px solid #e5e7eb; border-radius:8px; font-family:inherit; font-size:13px;" />
+            </div>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Matrícula</th>
+                    <th>KM</th>
+                    <th>Data</th>
+                    <th>Imagem</th>
+                  </tr>
+                </thead>
+                <tbody id="gasTbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section id="view-usuarios" data-title="Usuarios" hidden>
         <h1 class="page-title">Usuarios</h1>
 
@@ -449,6 +575,9 @@
             <h3 class="panel-title">Usuários Cadastrados</h3>
           </div>
           <div class="panel-body">
+            <div class="actions" style="gap:8px; padding:12px 16px;">
+              <input id="userFilterName" placeholder="Filtrar por nome" style="flex:1; max-width:280px; height:36px; padding:6px 10px; border:1px solid #e5e7eb; border-radius:8px; font-family:inherit; font-size:13px;" />
+            </div>
             <div class="table-responsive">
               <table class="table">
                 <thead>
@@ -578,6 +707,81 @@
         </div>
       </section>
 
+      <!-- Modal: Visualização da imagem da factura de ferramentas -->
+      <div id="herImgModal" class="modal" hidden>
+        <div class="modal-backdrop" aria-hidden="true"></div>
+        <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="herImgTitle">
+          <div class="modal-header">
+            <h3 id="herImgTitle">Factura de Herramienta</h3>
+            <button class="modal-close" id="btnCloseHerImgModal" type="button" aria-label="Fechar">×</button>
+          </div>
+          <div class="modal-body" style="padding:16px;">
+            <img id="herImgPreview" alt="Factura de Herramienta" style="max-width:100%; height:auto; border-radius:8px; border:1px solid #eef2f7;" />
+            <div class="actions" style="justify-content:flex-end; margin-top:12px; padding:0;">
+              <a id="btnDownloadHerImg" class="btn" href="#" download>Download</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal: Visualização da imagem da factura de gasoil -->
+      <div id="gasImgModal" class="modal" hidden>
+        <div class="modal-backdrop" aria-hidden="true"></div>
+        <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="gasImgTitle">
+          <div class="modal-header">
+            <h3 id="gasImgTitle">Factura de Gasoil</h3>
+            <button class="modal-close" id="btnCloseGasImgModal" type="button" aria-label="Fechar">×</button>
+          </div>
+          <div class="modal-body" style="padding:16px;">
+            <img id="gasImgPreview" alt="Factura de Gasoil" style="max-width:100%; height:auto; border-radius:8px; border:1px solid #eef2f7;" />
+            <div class="actions" style="justify-content:flex-end; margin-top:12px; padding:0;">
+              <a id="btnDownloadGasImg" class="btn" href="#" download>Download</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Edição de Bateria (Global) -->
+      <div id="batEditModal" class="modal" hidden>
+        <div class="modal-backdrop" aria-hidden="true" style="position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:10000;"></div>
+        <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="batEditModalTitle" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:90%; max-width:720px; background:#fff; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.2); z-index:10001;">
+          <div class="modal-header">
+            <h3 id="batEditModalTitle">Editar Bateria</h3>
+            <button class="modal-close" id="btnCloseBatEditModal" type="button" aria-label="Fechar">×</button>
+          </div>
+          <div class="modal-body">
+            <form id="batEditForm">
+              <div class="form-grid" style="grid-template-columns: repeat(2, minmax(160px,1fr));">
+                <div class="input">
+                  <label for="batEditModelo">Modelo</label>
+                  <input id="batEditModelo" name="modelo" required />
+                </div>
+                <div class="input">
+                  <label for="batEditAmperes">Amperes</label>
+                  <input id="batEditAmperes" name="amperes" type="number" step="1" min="0" required />
+                </div>
+                <div class="input">
+                  <label for="batEditTipo">Tipo</label>
+                  <input id="batEditTipo" name="tipo" required />
+                </div>
+                <div class="input">
+                  <label for="batEditPrecoSocio">Preço Sócio</label>
+                  <input id="batEditPrecoSocio" name="precoSocio" type="number" step="0.01" min="0" required />
+                </div>
+                <div class="input">
+                  <label for="batEditPrecoCliente">Preço Cliente</label>
+                  <input id="batEditPrecoCliente" name="precoCliente" type="number" step="0.01" min="0" required />
+                </div>
+              </div>
+              <div class="actions" style="justify-content:flex-end; padding-top:8px;">
+                <button class="btn" type="button" id="btnCancelBatEditModal" style="background:#6b7280">Cancelar</button>
+                <button class="btn" type="submit" id="batEditBtnSubmit">Atualizar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
     </main>
   </div>
 
@@ -638,6 +842,9 @@
       const sections = {
         dashboard: document.getElementById('view-dashboard'),
         usuarios: document.getElementById('view-usuarios'),
+        baterias: document.getElementById('view-baterias'),
+        facturasgasoil: document.getElementById('view-facturasgasoil'),
+        facturasherramientas: document.getElementById('view-facturasherramientas'),
         config: document.getElementById('view-config')
       };
       const pills = document.querySelectorAll('.menu .pill');
@@ -665,8 +872,9 @@
       if(modalBackdrop) modalBackdrop.addEventListener('click', closeUserModal);
       document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeUserModal(); });
       function setActive(section){
-        // ao sair de Usuarios, fecha modal
+        // ao sair de Usuarios/Baterias, reseta estados
         if(section !== 'usuarios'){ closeUserModal(); setCreateMode(); }
+        if(section !== 'baterias'){ batSetCreateMode(); }
         Object.entries(sections).forEach(([key, el])=>{
           if(!el) return;
           el.hidden = key !== section;
@@ -699,9 +907,12 @@
       };
       const writeUsers = (arr)=> localStorage.setItem(LS_KEY, JSON.stringify(arr));
       const tbody = document.getElementById('usersTbody');
+      const userFilterName = document.getElementById('userFilterName');
       function renderUsers(){
         const arr = readUsers();
-        tbody.innerHTML = arr.map((u, i)=>`
+        const q = (userFilterName && userFilterName.value || '').toLowerCase().trim();
+        const filtered = q ? arr.filter(u => (u.nome||'').toLowerCase().includes(q)) : arr;
+        tbody.innerHTML = filtered.map((u, i)=>`
           <tr>
             <td>${u.nome}</td>
             <td>${u.email}</td>
@@ -755,7 +966,8 @@
           }
           writeUsers(arr);
           form.reset();
-          renderUsers();
+          if(userFilterName){ userFilterName.addEventListener('input', renderUsers); }
+      renderUsers();
           closeUserModal();
           showToast(editIndex===null ? 'Usuário salvo.' : 'Usuário atualizado.');
           setCreateMode();
@@ -782,6 +994,359 @@
         });
       }
       renderUsers();
+
+      // =====================
+      // Baterias (CRUD simples em localStorage)
+      // =====================
+      const BAT_KEY = 'aribra_baterias';
+      const readBats = ()=>{ try{ return JSON.parse(localStorage.getItem(BAT_KEY)||'[]'); }catch{ return []; } };
+      const writeBats = (arr)=> localStorage.setItem(BAT_KEY, JSON.stringify(arr));
+
+      const batForm = document.getElementById('batForm');
+      const batBtnSubmit = document.getElementById('batBtnSubmit');
+      const batBtnCancelar = document.getElementById('batBtnCancelar');
+      const batTbody = document.getElementById('batTbody');
+      const batFilterModelo = document.getElementById('batFilterModelo');
+      let batEditIndex = null;
+
+      function fmtMoney(v){
+        const n = Number(v);
+        if(Number.isNaN(n)) return '-';
+        try{ return n.toLocaleString(undefined, { style:'currency', currency:'EUR' }); }catch{ return n.toFixed(2); }
+      }
+
+      function batRender(){
+        if(!batTbody) return;
+        const arr = readBats();
+        const q = (batFilterModelo && batFilterModelo.value || '').toLowerCase().trim();
+        const filtered = q ? arr.filter(b => (b.modelo||'').toLowerCase().includes(q)) : arr;
+        batTbody.innerHTML = filtered.map((b,i)=>`
+          <tr>
+            <td>${b.modelo||''}</td>
+            <td>${b.amperes||''}</td>
+            <td>${b.tipo||''}</td>
+            <td>${fmtMoney(b.precoSocio)}</td>
+            <td>${fmtMoney(b.precoCliente)}</td>
+            <td style="display:flex; gap:8px;">
+              <button class="btn" data-act="edit" data-idx="${i}" style="background:#0ea5e9">Editar</button>
+              <button class="btn" data-act="del" data-idx="${i}" style="background:#ef4444">Remover</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      function batSetCreateMode(){
+        batEditIndex = null;
+        if(batForm) batForm.reset();
+        if(batBtnSubmit) batBtnSubmit.textContent = 'Salvar';
+      }
+
+      function batSetEditMode(idx){
+        const arr = readBats();
+        const b = arr[idx];
+        if(!b) return;
+        batEditIndex = idx;
+        if(batBtnSubmit) batBtnSubmit.textContent = 'Atualizar';
+        const m = document.getElementById('batModelo');
+        const a = document.getElementById('batAmperes');
+        const t = document.getElementById('batTipo');
+        const ps = document.getElementById('batPrecoSocio');
+        const pc = document.getElementById('batPrecoCliente');
+        if(m) m.value = b.modelo||'';
+        if(a) a.value = b.amperes||'';
+        if(t) t.value = b.tipo||'';
+        if(ps) ps.value = b.precoSocio||'';
+        if(pc) pc.value = b.precoCliente||'';
+      }
+
+      if(batForm){
+        batForm.addEventListener('submit', (ev)=>{
+          ev.preventDefault();
+          const fd = new FormData(batForm);
+          const data = Object.fromEntries(fd.entries());
+          // normaliza números
+          const b = {
+            modelo: String(data.modelo||'').trim(),
+            amperes: Number(data.amperes||0),
+            tipo: String(data.tipo||'').trim(),
+            precoSocio: Number(data.precoSocio||0),
+            precoCliente: Number(data.precoCliente||0)
+          };
+          if(!b.modelo){ showToast('Informe o modelo.'); return; }
+          if(!b.tipo){ showToast('Informe o tipo.'); return; }
+          const arr = readBats();
+          if(batEditIndex===null){ arr.push(b); }
+          else { arr[batEditIndex] = b; }
+          writeBats(arr);
+          if(batFilterModelo){ batFilterModelo.addEventListener('input', batRender); }
+      batRender();
+          batSetCreateMode();
+          showToast(batEditIndex===null ? 'Bateria adicionada.' : 'Bateria atualizada.');
+        });
+      }
+      if(batBtnCancelar){ batBtnCancelar.addEventListener('click', batSetCreateMode); }
+      // Modal de edição de bateria
+      const batEditModal = document.getElementById('batEditModal');
+      const btnCloseBatEditModal = document.getElementById('btnCloseBatEditModal');
+      const btnCancelBatEditModal = document.getElementById('btnCancelBatEditModal');
+      const batEditForm = document.getElementById('batEditForm');
+      const batEditBackdrop = batEditModal ? batEditModal.querySelector('.modal-backdrop') : null;
+      const batEditModelo = document.getElementById('batEditModelo');
+      const batEditAmperes = document.getElementById('batEditAmperes');
+      const batEditTipo = document.getElementById('batEditTipo');
+      const batEditPrecoSocio = document.getElementById('batEditPrecoSocio');
+      const batEditPrecoCliente = document.getElementById('batEditPrecoCliente');
+      let batEditIdx = null;
+
+      function openBatEditModal(idx){
+        const arr = readBats();
+        const b = arr[idx];
+        if(!b || !batEditModal){ showToast && showToast('Erro ao abrir modal.'); return; }
+        batEditIdx = idx;
+        if(batEditModelo) batEditModelo.value = b.modelo || '';
+        if(batEditAmperes) batEditAmperes.value = b.amperes || '';
+        if(batEditTipo) batEditTipo.value = b.tipo || '';
+        if(batEditPrecoSocio) batEditPrecoSocio.value = b.precoSocio ?? '';
+        if(batEditPrecoCliente) batEditPrecoCliente.value = b.precoCliente ?? '';
+        batEditModal.hidden = false;
+        // força visibilidade caso estilos dependam de classe
+        batEditModal.style.display = 'block';
+        batEditModal.classList.add('open');
+        // foca primeiro campo para evidenciar abertura
+        setTimeout(()=>{ if(batEditModelo) batEditModelo.focus(); }, 0);
+      }
+      function closeBatEditModal(){
+        if(!batEditModal) return;
+        batEditModal.classList.remove('open');
+        setTimeout(()=>{ batEditModal.hidden = true; batEditModal.style.display=''; batEditIdx = null; }, 150);
+      }
+      if(btnCloseBatEditModal) btnCloseBatEditModal.addEventListener('click', closeBatEditModal);
+      if(btnCancelBatEditModal) btnCancelBatEditModal.addEventListener('click', closeBatEditModal);
+      if(batEditBackdrop) batEditBackdrop.addEventListener('click', closeBatEditModal);
+      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeBatEditModal(); });
+
+      if(batEditForm){
+        batEditForm.addEventListener('submit', (ev)=>{
+          ev.preventDefault();
+          if(batEditIdx===null){ closeBatEditModal(); return; }
+          const fd = new FormData(batEditForm);
+          const data = Object.fromEntries(fd.entries());
+          const arr = readBats();
+          const base = arr[batEditIdx];
+          if(!base){ closeBatEditModal(); return; }
+          const updated = {
+            modelo: String(data.modelo||'').trim(),
+            amperes: Number(data.amperes||0),
+            tipo: String(data.tipo||'').trim(),
+            precoSocio: Number(data.precoSocio||0),
+            precoCliente: Number(data.precoCliente||0)
+          };
+          if(!updated.modelo){ showToast('Informe o modelo.'); return; }
+          if(!updated.tipo){ showToast('Informe o tipo.'); return; }
+          arr[batEditIdx] = updated;
+          writeBats(arr);
+          batRender();
+          closeBatEditModal();
+          showToast('Bateria atualizada.');
+        });
+      }
+
+      if(batTbody){
+        batTbody.addEventListener('click', (e)=>{
+          const del = e.target.closest('button[data-act="del"]');
+          const edit = e.target.closest('button[data-act="edit"]');
+          if(del){
+            const idx = +del.dataset.idx;
+            const arr = readBats();
+            arr.splice(idx,1);
+            writeBats(arr);
+            batRender();
+            return;
+          }
+          if(edit){
+            const idx = +edit.dataset.idx;
+            openBatEditModal(idx);
+            return;
+          }
+        });
+      }
+      batRender();
+
+      // =====================
+      // Facturas Gasoil (visualização)
+      // =====================
+      const GAS_KEY = 'aribra_facturas_gasoil';
+      const gasTbody = document.getElementById('gasTbody');
+      const gasFilterName = document.getElementById('gasFilterName');
+      const gasFilterDate = document.getElementById('gasFilterDate');
+      function gasRead(){ try{ return JSON.parse(localStorage.getItem(GAS_KEY)||'[]'); }catch{ return []; } }
+      function renderGas(){
+        if(!gasTbody) return;
+        const arr = gasRead();
+        const q = (gasFilterName && gasFilterName.value || '').toLowerCase().trim();
+        const d = (gasFilterDate && gasFilterDate.value || '').trim(); // 'YYYY-MM-DD'
+        const filtered = arr.filter(g => {
+          const okName = q ? (String(g.nome||'').toLowerCase().includes(q)) : true;
+          if(!okName) return false;
+          if(!d) return true;
+          if(!g.createdAt) return false;
+          const day = new Date(g.createdAt);
+          if(Number.isNaN(day.getTime())) return false;
+          const isoDay = `${day.getFullYear()}-${String(day.getMonth()+1).padStart(2,'0')}-${String(day.getDate()).padStart(2,'0')}`;
+          return isoDay === d;
+        });
+        gasTbody.innerHTML = filtered.map((g, i)=>{
+          const km = (g.km===null || typeof g.km==='undefined' || isNaN(Number(g.km))) ? '-' : Number(g.km);
+          const dt = g.createdAt ? (new Date(g.createdAt)).toLocaleString() : '-';
+          const img = g.imagem ? `<img src="${g.imagem}" alt="Factura" data-img="${g.imagem}" data-name="${(g.nome||'').replace(/"/g,'&quot;')}" data-mat="${(g.matricula||'').replace(/"/g,'&quot;')}" data-created="${g.createdAt||''}" style="max-width:120px; height:auto; border:1px solid #e5e7eb; border-radius:6px; cursor: zoom-in;" />` : '-';
+          return `
+            <tr>
+              <td>${g.nome||''}</td>
+              <td>${g.matricula||''}</td>
+              <td>${km}</td>
+              <td>${dt}</td>
+              <td>${img}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+      if(gasFilterName){ gasFilterName.addEventListener('input', renderGas); }
+      if(gasFilterDate){ gasFilterDate.addEventListener('change', renderGas); }
+      renderGas();
+      window.addEventListener('storage', (e)=>{ if(e.key===GAS_KEY) renderGas(); });
+      setInterval(renderGas, 15000);
+
+      // =====================
+      // Facturas Herramientas (visualização)
+      // =====================
+      const HER_KEY = 'aribra_facturas_herramientas';
+      const herTbody = document.getElementById('herTbody');
+      const herFilterName = document.getElementById('herFilterName');
+      const herFilterDate = document.getElementById('herFilterDate');
+      function herRead(){ try{ return JSON.parse(localStorage.getItem(HER_KEY)||'[]'); }catch{ return []; } }
+      function renderHer(){
+        if(!herTbody) return;
+        const arr = herRead();
+        const q = (herFilterName && herFilterName.value || '').toLowerCase().trim();
+        const d = (herFilterDate && herFilterDate.value || '').trim();
+        const filtered = arr.filter(h => {
+          const okName = q ? (String(h.nome||'').toLowerCase().includes(q)) : true;
+          if(!okName) return false;
+          if(!d) return true;
+          if(!h.createdAt) return false;
+          const day = new Date(h.createdAt);
+          if(Number.isNaN(day.getTime())) return false;
+          const isoDay = `${day.getFullYear()}-${String(day.getMonth()+1).padStart(2,'0')}-${String(day.getDate()).padStart(2,'0')}`;
+          return isoDay === d;
+        });
+        herTbody.innerHTML = filtered.map((h)=>{
+          const dt = h.createdAt ? (new Date(h.createdAt)).toLocaleString() : '-';
+          const img = h.imagem ? `<img src="${h.imagem}" alt="Factura" data-img="${h.imagem}" data-item="${(h.item||'').replace(/"/g,'&quot;')}" data-created="${h.createdAt||''}" style="max-width:120px; height:auto; border:1px solid #e5e7eb; border-radius:6px; cursor: zoom-in;" />` : '-';
+          return `
+            <tr>
+              <td>${h.nome||''}</td>
+              <td>${h.item||''}</td>
+              <td>${dt}</td>
+              <td>${img}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+      if(herFilterName){ herFilterName.addEventListener('input', renderHer); }
+      if(herFilterDate){ herFilterDate.addEventListener('change', renderHer); }
+      renderHer();
+      window.addEventListener('storage', (e)=>{ if(e.key===HER_KEY) renderHer(); });
+      setInterval(renderHer, 15000);
+
+      // Modal de visualização da imagem da factura (herramientas)
+      const herImgModal = document.getElementById('herImgModal');
+      const btnCloseHerImgModal = document.getElementById('btnCloseHerImgModal');
+      const herImgPreview = document.getElementById('herImgPreview');
+      const btnDownloadHerImg = document.getElementById('btnDownloadHerImg');
+      const herImgBackdrop = herImgModal ? herImgModal.querySelector('.modal-backdrop') : null;
+
+      function buildHerFileName(item, created){
+        let d = '';
+        try{ if(created){ const x = new Date(created); d = `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`; } }catch(_){/* ignore */}
+        const it = (item||'item').toString().replace(/[^a-zA-Z0-9_-]+/g,'-');
+        return `factura-herramienta-${it}${d?'-'+d:''}.png`;
+      }
+
+      function openHerImgModal(url, filename){
+        if(!herImgModal) return;
+        if(herImgPreview) herImgPreview.src = url;
+        if(btnDownloadHerImg){
+          btnDownloadHerImg.href = url;
+          btnDownloadHerImg.setAttribute('download', filename || 'factura-herramienta.png');
+        }
+        herImgModal.hidden = false;
+        requestAnimationFrame(()=> herImgModal.classList.add('open'));
+      }
+      function closeHerImgModal(){
+        if(!herImgModal) return;
+        herImgModal.classList.remove('open');
+        setTimeout(()=>{ herImgModal.hidden = true; if(herImgPreview) herImgPreview.src=''; }, 150);
+      }
+      if(herTbody){
+        herTbody.addEventListener('click', (e)=>{
+          const imgEl = e.target.closest('img[data-img]');
+          if(!imgEl) return;
+          const url = imgEl.getAttribute('data-img');
+          const item = imgEl.getAttribute('data-item') || '';
+          const created = imgEl.getAttribute('data-created') || '';
+          const filename = buildHerFileName(item, created);
+          openHerImgModal(url, filename);
+        });
+      }
+      if(btnCloseHerImgModal) btnCloseHerImgModal.addEventListener('click', closeHerImgModal);
+      if(herImgBackdrop) herImgBackdrop.addEventListener('click', closeHerImgModal);
+      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeHerImgModal(); });
+
+      // Modal de visualização da imagem da factura
+      const gasImgModal = document.getElementById('gasImgModal');
+      const btnCloseGasImgModal = document.getElementById('btnCloseGasImgModal');
+      const gasImgPreview = document.getElementById('gasImgPreview');
+      const btnDownloadGasImg = document.getElementById('btnDownloadGasImg');
+      const gasImgBackdrop = gasImgModal ? gasImgModal.querySelector('.modal-backdrop') : null;
+
+      function buildFileName(mat, created){
+        let d = '';
+        try{ if(created){ const x = new Date(created); d = `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`; } }catch(_){/* ignore */}
+        const m = (mat||'sem-placa').toString().replace(/[^a-zA-Z0-9_-]+/g,'-');
+        return `factura-gasoil-${m}${d?'-'+d:''}.png`;
+      }
+
+      function openGasImgModal(url, filename){
+        if(!gasImgModal) return;
+        if(gasImgPreview) gasImgPreview.src = url;
+        if(btnDownloadGasImg){
+          btnDownloadGasImg.href = url;
+          btnDownloadGasImg.setAttribute('download', filename || 'factura-gasoil.png');
+        }
+        gasImgModal.hidden = false;
+        requestAnimationFrame(()=> gasImgModal.classList.add('open'));
+      }
+      function closeGasImgModal(){
+        if(!gasImgModal) return;
+        gasImgModal.classList.remove('open');
+        setTimeout(()=>{ gasImgModal.hidden = true; if(gasImgPreview) gasImgPreview.src=''; }, 150);
+      }
+
+      if(gasTbody){
+        gasTbody.addEventListener('click', (e)=>{
+          const imgEl = e.target.closest('img[data-img]');
+          if(!imgEl) return;
+          const url = imgEl.getAttribute('data-img');
+          const mat = imgEl.getAttribute('data-mat') || '';
+          const created = imgEl.getAttribute('data-created') || '';
+          const filename = buildFileName(mat, created);
+          openGasImgModal(url, filename);
+        });
+      }
+      if(btnCloseGasImgModal) btnCloseGasImgModal.addEventListener('click', closeGasImgModal);
+      if(gasImgBackdrop) gasImgBackdrop.addEventListener('click', closeGasImgModal);
+      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeGasImgModal(); });
+
       // =====================
       // Configurações (senha admin + mensagens agendadas)
       // =====================
