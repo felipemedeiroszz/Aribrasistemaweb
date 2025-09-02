@@ -971,10 +971,14 @@
           ev.preventDefault();
           const data = Object.fromEntries(new FormData(form).entries());
           const arr = readUsers();
+          const senha = (data.senha || '').toString().trim();
           if(editIndex===null){
-            arr.push({ nome:data.nome, email:data.email, perfil:'operador' });
+            // criação: armazenar senha informada
+            arr.push({ nome:data.nome, email:data.email, perfil:'operador', senha: senha });
           } else {
-            arr[editIndex] = { nome:data.nome, email:data.email, perfil:'operador' };
+            // edição: manter senha anterior se campo estiver vazio
+            const prev = arr[editIndex] || {};
+            arr[editIndex] = { nome:data.nome, email:data.email, perfil:'operador', senha: senha || prev.senha };
           }
           writeUsers(arr);
           form.reset();

@@ -305,20 +305,23 @@
         return showMessage('Confirmação', message, { showCancel: true });
       };
 
-      // Login simples: valida senha fixa e entra no admin
+      // Login de usuário: valida contra usuários cadastrados no admin (localStorage)
       const loginForm = document.getElementById('loginForm');
       if (loginForm) {
         loginForm.addEventListener('submit', (e)=>{
           e.preventDefault();
           const email = document.getElementById('email').value.trim();
           const pwd = document.getElementById('password').value.trim();
-          if (pwd === 'aribra2025') {
-            sessionStorage.setItem('aribra_auth','1');
-            if(email){ sessionStorage.setItem('aribra_user_name', email); }
-            window.location.href = 'admin.html';
-          } else {
-            showMessage('Aviso', 'Senha incorreta.');
-          }
+          let users = [];
+          try { users = JSON.parse(localStorage.getItem('aribra_users')||'[]'); } catch(_) { users = []; }
+          const found = users.find(u => (u.email||'').toLowerCase() === email.toLowerCase());
+          if(!found){ showMessage('Aviso', 'Usuário não encontrado.'); return; }
+          if(!found.senha){ showMessage('Aviso', 'Usuário sem senha definida. Edite no admin para definir uma senha.'); return; }
+          if(String(found.senha) !== pwd){ showMessage('Aviso', 'Email ou senha inválidos.'); return; }
+          // sucesso: abre o painel do usuário
+          sessionStorage.setItem('aribra_auth','1');
+          sessionStorage.setItem('aribra_user_name', found.nome || email);
+          window.location.href = 'dashboard.html';
         });
       }
       const logo = document.querySelector('.top-logo');
