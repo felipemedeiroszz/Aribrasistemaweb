@@ -322,24 +322,20 @@
 
       <section class="kpis">
         <div class="kpi">
-          <div class="kpi-label">Total</div>
-          <div class="kpi-value">1.248</div>
-          <div class="kpi-trend up">+12%</div>
+          <div class="kpi-label">Total Facturas</div>
+          <div class="kpi-value" id="admKpiFacTotal">0</div>
         </div>
         <div class="kpi">
-          <div class="kpi-label">Hoje</div>
-          <div class="kpi-value">36</div>
-          <div class="kpi-trend up">+5%</div>
+          <div class="kpi-label">Gasoil</div>
+          <div class="kpi-value" id="admKpiFacGas">0</div>
         </div>
         <div class="kpi">
-          <div class="kpi-label">Pendentes</div>
-          <div class="kpi-value">12</div>
-          <div class="kpi-trend down">-3%</div>
+          <div class="kpi-label">Herramientas</div>
+          <div class="kpi-value" id="admKpiFacHer">0</div>
         </div>
         <div class="kpi">
-          <div class="kpi-label">Concluídos</div>
-          <div class="kpi-value">24</div>
-          <div class="kpi-trend up">+8%</div>
+          <div class="kpi-label">Modelos de Baterias</div>
+          <div class="kpi-value" id="admKpiBat">0</div>
         </div>
       </section>
 
@@ -348,55 +344,21 @@
       <section class="main-grid">
         <div class="panel">
           <div class="panel-header">
-            <h3 class="panel-title">Recentes</h3>
-            <button class="btn-more" aria-label="Ver mais">Ver Tudo</button>
+            <h3 class="panel-title">Últimas Facturas</h3>
+            <button class="btn-more" aria-label="Ver mais" onclick="document.querySelector('[data-section=\'facturasgasoil\']')?.click()">Ver Tudo</button>
           </div>
           <div class="panel-body">
             <div class="table-responsive">
               <table class="table">
                 <thead>
                   <tr>
-                    <th>ID</th>
-                    <th>Cliente</th>
-                    <th>Status</th>
+                    <th>Tipo</th>
+                    <th>Nome</th>
+                    <th>Detalhe</th>
                     <th>Data</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr>
-                    <td class="text-mono">#2024</td>
-                    <td>
-                      <div class="user-avatar">
-                        <span>ML</span>
-                        María López
-                      </div>
-                    </td>
-                    <td><span class="badge success">Concluído</span></td>
-                    <td>29/08/2025</td>
-                  </tr>
-                  <tr>
-                    <td class="text-mono">#2023</td>
-                    <td>
-                      <div class="user-avatar">
-                        <span>PS</span>
-                        Pedro Silva
-                      </div>
-                    </td>
-                    <td><span class="badge warning">Pendente</span></td>
-                    <td>29/08/2025</td>
-                  </tr>
-                  <tr>
-                    <td class="text-mono">#2022</td>
-                    <td>
-                      <div class="user-avatar">
-                        <span>LF</span>
-                        Luisa Fernández
-                      </div>
-                    </td>
-                    <td><span class="badge success">Concluído</span></td>
-                    <td>28/08/2025</td>
-                  </tr>
-                </tbody>
+                <tbody id="admRecentTbody"></tbody>
               </table>
             </div>
           </div>
@@ -897,6 +859,56 @@
         const sec = btn.dataset.section;
         if(sections[sec]){
           setActive(sec);
+        }
+      });
+
+      // =====================
+      // Dashboard (Admin) - KPIs + Últimas Facturas
+      // =====================
+      const admKpiFacTotal = document.getElementById('admKpiFacTotal');
+      const admKpiFacGas = document.getElementById('admKpiFacGas');
+      const admKpiFacHer = document.getElementById('admKpiFacHer');
+      const admKpiBat = document.getElementById('admKpiBat');
+      const admRecentTbody = document.getElementById('admRecentTbody');
+
+      function readGas(){ try{ return JSON.parse(localStorage.getItem('aribra_facturas_gasoil')||'[]'); }catch{ return []; } }
+      function readHer(){ try{ return JSON.parse(localStorage.getItem('aribra_facturas_herramientas')||'[]'); }catch{ return []; } }
+      function readBat(){ try{ return JSON.parse(localStorage.getItem('aribra_baterias')||'[]'); }catch{ return []; } }
+
+      function renderAdminKpis(){
+        const gas = readGas();
+        const her = readHer();
+        const bat = readBat();
+        if(admKpiFacGas) admKpiFacGas.textContent = String(gas.length);
+        if(admKpiFacHer) admKpiFacHer.textContent = String(her.length);
+        if(admKpiFacTotal) admKpiFacTotal.textContent = String(gas.length + her.length);
+        if(admKpiBat) admKpiBat.textContent = String(Array.isArray(bat)? bat.length : 0);
+      }
+
+      function renderAdminRecent(){
+        if(!admRecentTbody) return;
+        const gas = readGas().map(x=>({ tipo:'Gasoil', nome:x.nome||'', detalhe:x.matricula||'', createdAt:x.createdAt }));
+        const her = readHer().map(x=>({ tipo:'Herramientas', nome:x.nome||'', detalhe:x.item||'', createdAt:x.createdAt }));
+        const all = gas.concat(her).filter(x=> x.createdAt && !Number.isNaN(Date.parse(x.createdAt)));
+        all.sort((a,b)=> Date.parse(b.createdAt) - Date.parse(a.createdAt));
+        const top = all.slice(0,5);
+        admRecentTbody.innerHTML = top.map(r=>{
+          const dateStr = new Date(r.createdAt).toLocaleString();
+          return `<tr>
+            <td>${r.tipo}</td>
+            <td>${r.nome}</td>
+            <td>${r.detalhe}</td>
+            <td>${dateStr}</td>
+          </tr>`;
+        }).join('');
+      }
+
+      renderAdminKpis();
+      renderAdminRecent();
+      window.addEventListener('storage', (e)=>{
+        if(e.key==='aribra_facturas_gasoil' || e.key==='aribra_facturas_herramientas' || e.key==='aribra_baterias'){
+          renderAdminKpis();
+          renderAdminRecent();
         }
       });
 

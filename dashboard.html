@@ -162,45 +162,26 @@
         </div>
 
         <section class="kpis">
-          <div class="kpi"><div class="kpi-label">Total</div><div class="kpi-value">1.248</div></div>
-          <div class="kpi"><div class="kpi-label">Hoje</div><div class="kpi-value">36</div></div>
-          <div class="kpi"><div class="kpi-label">Pendentes</div><div class="kpi-value">12</div></div>
-          <div class="kpi"><div class="kpi-label">Concluídos</div><div class="kpi-value">24</div></div>
+          <div class="kpi"><div class="kpi-label">Total Facturas</div><div class="kpi-value" id="kpiFacTotal">0</div></div>
+          <div class="kpi"><div class="kpi-label">Gasoil</div><div class="kpi-value" id="kpiFacGas">0</div></div>
+          <div class="kpi"><div class="kpi-label">Herramientas</div><div class="kpi-value" id="kpiFacHer">0</div></div>
+          <div class="kpi"><div class="kpi-label">Modelos de Baterias</div><div class="kpi-value" id="kpiBatCount">0</div></div>
         </section>
 
         <section class="main-grid">
           <div class="panel">
-            <div class="panel-title">Recentes</div>
+            <div class="panel-title">Últimas Facturas</div>
             <div class="panel-body">
               <table class="table">
                 <thead>
                   <tr>
-                    <th>ID</th>
-                    <th>Cliente</th>
-                    <th>Status</th>
+                    <th>Tipo</th>
+                    <th>Nome</th>
+                    <th>Detalhe</th>
                     <th>Data</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr>
-                    <td>#1024</td>
-                    <td>Juan Pérez</td>
-                    <td><span class="badge ok">Concluído</span></td>
-                    <td>29/08/2025</td>
-                  </tr>
-                  <tr>
-                    <td>#1023</td>
-                    <td>Ana Gómez</td>
-                    <td><span class="badge pend">Pendente</span></td>
-                    <td>29/08/2025</td>
-                  </tr>
-                  <tr>
-                    <td>#1022</td>
-                    <td>Carlos Ruiz</td>
-                    <td><span class="badge ok">Concluído</span></td>
-                    <td>28/08/2025</td>
-                  </tr>
-                </tbody>
+                <tbody id="recentTbody"></tbody>
               </table>
             </div>
           </div>
@@ -529,6 +510,55 @@
           renderBats();
         });
       }
+
+      // =====================
+      // KPIs + Recentes (dinâmicos)
+      // =====================
+      const kpiFacTotal = document.getElementById('kpiFacTotal');
+      const kpiFacGas = document.getElementById('kpiFacGas');
+      const kpiFacHer = document.getElementById('kpiFacHer');
+      const kpiBatCount = document.getElementById('kpiBatCount');
+      const recentTbody = document.getElementById('recentTbody');
+
+      function herRead(){ try{ return JSON.parse(localStorage.getItem('aribra_facturas_herramientas')||'[]'); }catch{ return []; } }
+      function gasRead(){ try{ return JSON.parse(localStorage.getItem('aribra_facturas_gasoil')||'[]'); }catch{ return []; } }
+
+      function renderKpis(){
+        const gas = gasRead();
+        const her = herRead();
+        const bats = readBats();
+        if(kpiFacGas) kpiFacGas.textContent = String(gas.length);
+        if(kpiFacHer) kpiFacHer.textContent = String(her.length);
+        if(kpiFacTotal) kpiFacTotal.textContent = String(gas.length + her.length);
+        if(kpiBatCount) kpiBatCount.textContent = String(Array.isArray(bats) ? bats.length : 0);
+      }
+
+      function renderRecent(){
+        if(!recentTbody) return;
+        const gas = gasRead().map(x=>({ tipo:'Gasoil', nome:x.nome||'', detalhe:x.matricula||'', createdAt:x.createdAt }));
+        const her = herRead().map(x=>({ tipo:'Herramientas', nome:x.nome||'', detalhe:x.item||'', createdAt:x.createdAt }));
+        const all = gas.concat(her).filter(x=> x.createdAt && !Number.isNaN(Date.parse(x.createdAt)));
+        all.sort((a,b)=> Date.parse(b.createdAt) - Date.parse(a.createdAt));
+        const top = all.slice(0,5);
+        recentTbody.innerHTML = top.map(r=>{
+          const dateStr = new Date(r.createdAt).toLocaleString();
+          return `<tr>
+            <td>${r.tipo}</td>
+            <td>${r.nome}</td>
+            <td>${r.detalhe}</td>
+            <td>${dateStr}</td>
+          </tr>`;
+        }).join('');
+      }
+
+      renderKpis();
+      renderRecent();
+      window.addEventListener('storage', (e)=>{
+        if(e.key===GAS_KEY || e.key===HER_KEY || e.key===BAT_KEY){
+          renderKpis();
+          renderRecent();
+        }
+      });
 
       // =====================
       // Facturas Gasoil (Cadastro pelo usuário)
