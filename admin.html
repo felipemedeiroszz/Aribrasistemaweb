@@ -44,7 +44,8 @@
     .brand img{ width:66px; height:auto; }
     .brand .name{ font-weight:800; letter-spacing:0.5px; color:var(--navy); font-size:18px; }
     .brand .sub{ font-size:11px; color:#6c7b86; letter-spacing:0.6px; margin-top:-6px; }
-    .menu{ width:100%; display:flex; flex-direction:column; gap:16px; margin-top:8px; }
+    .menu{ width:100%; display:flex; flex-direction:column; gap:16px; margin-top:8px; flex:1; }
+    #btnLogout{ margin-top:auto; }
     .pill{ 
       display:flex; 
       align-items:center; 
@@ -310,7 +311,8 @@
         <button class="pill" type="button" data-section="facturasgasoil">Facturas Gasoil</button>
         <button class="pill" type="button" data-section="baterias">Baterias</button>
         <button class="pill" type="button" data-section="item6">Item 6</button>
-        <button class="pill" type="button" data-section="item7">Item 7</button>
+        <button class="pill" type="button" data-section="config">Configurações</button>
+        <button class="pill" id="btnLogout" type="button" style="background:#ef4444">Sair</button>
       </nav>
     </aside>
 
@@ -340,6 +342,8 @@
           <div class="kpi-trend up">+8%</div>
         </div>
       </section>
+
+
 
       <section class="main-grid">
         <div class="panel">
@@ -500,6 +504,80 @@
           </div>
         </div>
       </section>
+
+      <section id="view-config" data-title="Configurações" hidden>
+        <h1 class="page-title">Configurações</h1>
+
+        <div class="panel" style="margin-bottom:16px;">
+          <div class="panel-header">
+            <h3 class="panel-title">Alterar senha do administrador</h3>
+          </div>
+          <div class="panel-body">
+            <form id="adminPwdForm">
+              <div class="form-grid" style="grid-template-columns: repeat(3, minmax(200px,1fr));">
+                <div class="input">
+                  <label for="curPwd">Senha atual</label>
+                  <input id="curPwd" name="curPwd" type="password" required />
+                </div>
+                <div class="input">
+                  <label for="newPwd">Nova senha</label>
+                  <input id="newPwd" name="newPwd" type="password" minlength="4" required />
+                </div>
+                <div class="input">
+                  <label for="newPwd2">Confirmar nova senha</label>
+                  <input id="newPwd2" name="newPwd2" type="password" minlength="4" required />
+                </div>
+              </div>
+              <div class="actions" style="justify-content:flex-end; padding-top:8px;">
+                <button class="btn" type="submit">Salvar nova senha</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Mensagens do sistema (agendar)</h3>
+          </div>
+          <div class="panel-body">
+            <form id="msgForm">
+              <div class="form-grid" style="grid-template-columns: 1fr 220px 220px;">
+                <div class="input">
+                  <label for="msgText">Mensagem</label>
+                  <input id="msgText" name="msgText" maxlength="200" placeholder="Texto que aparecerá no dashboard" required />
+                </div>
+                <div class="input">
+                  <label for="msgWhen">Data e hora</label>
+                  <input id="msgWhen" name="msgWhen" type="datetime-local" required />
+                </div>
+                <div class="input">
+                  <label for="msgUntil">Exibir até (opcional)</label>
+                  <input id="msgUntil" name="msgUntil" type="datetime-local" />
+                </div>
+              </div>
+              <div class="actions" style="justify-content:flex-end; padding-top:8px;">
+                <button class="btn" type="submit">Agendar mensagem</button>
+              </div>
+            </form>
+
+            <div class="table-responsive" style="margin-top:8px;">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Mensagem</th>
+                    <th>Exibir de</th>
+                    <th>Exibir até</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="msgsTbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </main>
   </div>
 
@@ -521,10 +599,46 @@
       overlay.addEventListener('click', close);
       document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') close(); });
 
+      // Logout
+      const btnLogout = document.getElementById('btnLogout');
+      if(btnLogout){
+        btnLogout.addEventListener('click', ()=>{
+          try{ sessionStorage.removeItem('aribra_auth'); }catch(_){}
+          window.location.href = 'index.html';
+        });
+      }
+
+      // Toast centralizado (topo)
+      function showToast(msg, opts={}){
+        const duration = opts.duration ?? 2200;
+        let el = document.getElementById('app_toast');
+        if(!el){
+          el = document.createElement('div');
+          el.id = 'app_toast';
+          el.setAttribute('role','status');
+          el.style.cssText = [
+            'position:fixed',
+            'left:50%','top:50%','transform:translate(-50%,-50%)',
+            'background:#17384A','color:#fff',
+            'padding:12px 16px','border-radius:12px',
+            'box-shadow:0 12px 28px rgba(0,0,0,.18)',
+            'z-index:2000','opacity:0','transition:opacity .18s ease',
+            'font-weight:700','letter-spacing:.2px','font-size:13px',
+            'text-align:center','max-width:90vw','white-space:pre-wrap'
+          ].join(';');
+          document.body.appendChild(el);
+        }
+        el.textContent = msg;
+        el.style.opacity = '1';
+        clearTimeout(el._t);
+        el._t = setTimeout(()=>{ el.style.opacity='0'; }, duration);
+      }
+
       // Toggle seções (SPA simples)
       const sections = {
         dashboard: document.getElementById('view-dashboard'),
-        usuarios: document.getElementById('view-usuarios')
+        usuarios: document.getElementById('view-usuarios'),
+        config: document.getElementById('view-config')
       };
       const pills = document.querySelectorAll('.menu .pill');
       // Modal elementos e funções
@@ -643,7 +757,7 @@
           form.reset();
           renderUsers();
           closeUserModal();
-          alert(editIndex===null ? 'Usuário salvo.' : 'Usuário atualizado.');
+          showToast(editIndex===null ? 'Usuário salvo.' : 'Usuário atualizado.');
           setCreateMode();
         });
       }
@@ -668,6 +782,113 @@
         });
       }
       renderUsers();
+      // =====================
+      // Configurações (senha admin + mensagens agendadas)
+      // =====================
+      const ADMIN_PWD_KEY = 'aribra_admin_pwd';
+      const MSGS_KEY = 'aribra_scheduled_msgs';
+
+      // Garante uma senha inicial caso não exista (apenas local, demo)
+      try{
+        if(!localStorage.getItem(ADMIN_PWD_KEY)){
+          localStorage.setItem(ADMIN_PWD_KEY, 'admin');
+        }
+      }catch(_){/* ignore */}
+
+      // Alterar senha admin
+      const adminPwdForm = document.getElementById('adminPwdForm');
+      if(adminPwdForm){
+        adminPwdForm.addEventListener('submit', (ev)=>{
+          ev.preventDefault();
+          const fd = new FormData(adminPwdForm);
+          const cur = String(fd.get('curPwd')||'');
+          const np = String(fd.get('newPwd')||'');
+          const np2 = String(fd.get('newPwd2')||'');
+          const saved = localStorage.getItem(ADMIN_PWD_KEY)||'';
+          if(cur !== saved){ showToast('Senha atual incorreta.'); return; }
+          if(np.length < 4){ showToast('A nova senha deve ter pelo menos 4 caracteres.'); return; }
+          if(np !== np2){ showToast('A confirmação não confere.'); return; }
+          localStorage.setItem(ADMIN_PWD_KEY, np);
+          adminPwdForm.reset();
+          showToast('Senha atualizada com sucesso.');
+        });
+      }
+
+      // Utilidades de mensagens
+      const readMsgs = ()=>{ try{ return JSON.parse(localStorage.getItem(MSGS_KEY)||'[]'); }catch{ return []; } };
+      const writeMsgs = (arr)=> localStorage.setItem(MSGS_KEY, JSON.stringify(arr));
+
+      const msgsTbody = document.getElementById('msgsTbody');
+      function renderMsgs(){
+        if(!msgsTbody) return;
+        const arr = readMsgs();
+        const now = Date.now();
+        msgsTbody.innerHTML = arr.map((m, i)=>{
+          const startTs = new Date(m.when).getTime();
+          const untilTs = m.until ? new Date(m.until).getTime() : NaN;
+          const startStr = isNaN(startTs) ? '-' : new Date(startTs).toLocaleString();
+          const untilStr = isNaN(untilTs) ? '-' : new Date(untilTs).toLocaleString();
+          let badge = '<span class="badge warning">Agendada</span>';
+          if(!isNaN(startTs) && now >= startTs){
+            if(!isNaN(untilTs)){
+              badge = now <= untilTs ? '<span class="badge success">Ativa</span>' : '<span class="badge">Encerrada</span>';
+            } else {
+              badge = '<span class="badge success">Ativa</span>';
+            }
+          }
+          return `
+            <tr>
+              <td>${m.text}</td>
+              <td>${startStr}</td>
+              <td>${untilStr}</td>
+              <td>${badge}</td>
+              <td><button class="btn" data-act="delmsg" data-idx="${i}" style="background:#ef4444">Remover</button></td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      if(msgsTbody){
+        msgsTbody.addEventListener('click', (e)=>{
+          const btn = e.target.closest('button[data-act="delmsg"]');
+          if(!btn) return;
+          const idx = +btn.dataset.idx;
+          const arr = readMsgs();
+          arr.splice(idx,1);
+          writeMsgs(arr);
+          renderMsgs();
+        });
+      }
+
+      const msgForm = document.getElementById('msgForm');
+      if(msgForm){
+        msgForm.addEventListener('submit', (ev)=>{
+          ev.preventDefault();
+          const fd = new FormData(msgForm);
+          const text = String(fd.get('msgText')||'').trim();
+          const when = String(fd.get('msgWhen')||'');
+          const until = String(fd.get('msgUntil')||'');
+          if(!text){ showToast('Informe a mensagem.'); return; }
+          if(!when){ showToast('Informe data e hora inicial.'); return; }
+          const ts = Date.parse(when);
+          if(isNaN(ts)){ showToast('Data/hora inicial inválida.'); return; }
+          let untilIso = '';
+          if(until){
+            const uts = Date.parse(until);
+            if(isNaN(uts)){ showToast('Data/hora "Exibir até" inválida.'); return; }
+            if(uts < ts){ showToast('"Exibir até" deve ser após a data inicial.'); return; }
+            untilIso = new Date(uts).toISOString();
+          }
+          const arr = readMsgs();
+          arr.push({ text, when: new Date(ts).toISOString(), until: untilIso || undefined, createdAt: new Date().toISOString() });
+          writeMsgs(arr);
+          msgForm.reset();
+          renderMsgs();
+          showToast('Mensagem agendada. Ela aparecerá no dashboard no intervalo definido.');
+        });
+      }
+
+      renderMsgs();
 
     })();
   </script>

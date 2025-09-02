@@ -49,7 +49,8 @@
     .brand .sub{ font-size:11px; color:#6c7b86; letter-spacing:0.6px; margin-top:-6px; }
 
     /* Botões ovais escuros (apenas decorativos para igualar a imagem) */
-    .menu{ width:100%; display:flex; flex-direction:column; gap:16px; margin-top:8px; }
+    .menu{ width:100%; display:flex; flex-direction:column; gap:16px; margin-top:8px; flex:1; }
+    #btnLogout{ margin-top:auto; }
     .pill{
       height:26px;
       border-radius:999px;
@@ -145,11 +146,19 @@
         <button class="pill" type="button" aria-label="Item 5"></button>
         <button class="pill" type="button" aria-label="Item 6"></button>
         <button class="pill" type="button" aria-label="Item 7"></button>
+        <button class="pill" id="btnLogout" type="button" style="background:#ef4444">Sair</button>
       </nav>
     </aside>
 
     <main class="content">
       <h1 class="page-title">Dashboard</h1>
+
+      <div id="schedMessages" style="display:none; margin:0 0 16px 0;">
+        <div class="panel">
+          <div class="panel-title">Mensagens do Sistema</div>
+          <div class="panel-body" id="schedMessagesBody"></div>
+        </div>
+      </div>
 
       <section class="kpis">
         <div class="kpi"><div class="kpi-label">Total</div><div class="kpi-value">1.248</div></div>
@@ -220,6 +229,52 @@
       btn.addEventListener('click', ()=>{ body.classList.contains('nav-open') ? close() : open(); });
       overlay.addEventListener('click', close);
       document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') close(); });
+
+      // Logout button
+      const btnLogout = document.getElementById('btnLogout');
+      if(btnLogout){
+        btnLogout.addEventListener('click', ()=>{
+          try{ sessionStorage.removeItem('aribra_auth'); }catch(_){}
+          window.location.href = 'index.html';
+        });
+      }
+
+      // Scheduled messages from admin (localStorage)
+      const MSGS_KEY = 'aribra_scheduled_msgs';
+      const wrap = document.getElementById('schedMessages');
+      const bodyEl = document.getElementById('schedMessagesBody');
+      const readMsgs = ()=>{ try{ return JSON.parse(localStorage.getItem(MSGS_KEY)||'[]'); }catch{ return []; } };
+
+      function renderScheduled(){
+        if(!wrap || !bodyEl) return;
+        const now = Date.now();
+        const msgs = readMsgs().filter(m=>{
+          const start = Date.parse(m.when);
+          const end = m.until ? Date.parse(m.until) : NaN;
+          if(Number.isNaN(start)) return false;
+          const started = start <= now;
+          const notEnded = Number.isNaN(end) || now <= end;
+          return started && notEnded;
+        });
+        if(msgs.length===0){
+          wrap.style.display = 'none';
+          bodyEl.innerHTML = '';
+          return;
+        }
+        wrap.style.display = '';
+        bodyEl.innerHTML = msgs.map(m=>{
+          const startStr = new Date(m.when).toLocaleString();
+          const endStr = m.until ? new Date(m.until).toLocaleString() : '';
+          const meta = endStr ? `Válida: ${startStr} — ${endStr}` : `Agendada para: ${startStr}`;
+          return `<div style="background:#f1f5f9; border:1px solid #e5e7eb; border-radius:8px; padding:10px 12px; margin-bottom:8px;">
+            <div style="font-weight:700; color:#17384A;">${m.text}</div>
+            <div style="font-size:12px; color:#6b7280;">${meta}</div>
+          </div>`;
+        }).join('');
+      }
+
+      renderScheduled();
+      setInterval(renderScheduled, 30000);
     })();
   </script>
 </body>
